@@ -1,0 +1,13 @@
+{
+  "name": "ken-bot",
+  "version": "0.0.1",
+  "description": "Ken bot is an interactive chatbot that will give the user information about their Hubspot account.",
+  "main": "server.js",
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "Ken Bot",
+  "dependencies": {
+  }
+}
