@@ -9,5 +9,7 @@
   },
   "author": "Ken Bot",
   "dependencies": {
+    "bluebird": "^3.5.0",
+    "request": "^2.81.0"
   }
 }
