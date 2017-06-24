@@ -4,6 +4,8 @@ TODO (Write a description)
 
 ## Commands
 
+### Tasks
+
 ### Deals
 * How many deals are in the `{stage}` stage.
 * How many deals are in the `{stage}` assigned to `{sales}`.
