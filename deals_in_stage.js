@@ -16,7 +16,8 @@ exports.handler = (event, context, callback) => {
     var sales_email = null;
 
     // It's not exactly clear what stage name could come back in the slot
-    // so we can just see if it includes one of our predefined ones.
+    // so we can just see if it includes one of our predefined ones. If it is not
+    // found then process a failed callback.
     if(stage.includes("discovery") === true) {
         stage_id = "a3984851-1f56-430b-b263-114bc22b3382";
     } else if(stage.includes("quote") === true) {
@@ -36,6 +37,8 @@ exports.handler = (event, context, callback) => {
     if(event.currentIntent.slots.sales !== null) {
         sales = event.currentIntent.slots.sales;
 
+        // We will check for both first and last name. If the name got through and
+        // it is not found then just process a failed callback.
         if(sales.includes("john") === true || sales.includes("wetzel") === true) {
             sales_email = "johnswetzel@gmail.com";
         } else if(sales.includes("andy") === true || sales.includes("puch") === true) {
@@ -45,7 +48,7 @@ exports.handler = (event, context, callback) => {
         }
     }
 
-    // Create the request into hubspot.
+    // Create the request into hubspot using the helper.
     hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=hubspot_owner_id", "GET", null).then((data) => {
         var num_deals = 0;
         var content   = "";
