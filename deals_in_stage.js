@@ -1,8 +1,9 @@
-// Reference
+// API reference for this intent.
 // https://api.hubapi.com/deals/v1/deal/paged?hapikey=[Hubspot_API_Key]&properties=dealstage&properties=hubspot_owner_id
 
 // Include the hubspot helper.
-const helper = require(__dirname + "/hubspot_helper");
+const hubspot_helper = require(__dirname + "/hubspot_helper");
+const lambda_helper  = require(__dirname + "/lambda_helper");
 
 // Handler for the lambda function.
 exports.handler = (event, context, callback) => {
@@ -27,7 +28,7 @@ exports.handler = (event, context, callback) => {
     } else if(stage.includes("won") === true) {
         stage_id = "1ee69bb3-ccc0-44a0-bf43-c6708087ce20";
     } else {
-        // @TODO Process callback and fail because it is not found.
+        return lambda_helper.processCloseCallback(callback, "I am sorry but we could not find the stage " + stage);
     }
 
     // If there is a sales slot configured check to see who it is if is none of the
@@ -40,12 +41,12 @@ exports.handler = (event, context, callback) => {
         } else if(sales.includes("andy") === true) {
             sales_email = "andrewpuch@gmail.com";
         } else {
-            // @TODO Process callback and fail because it is not found.
+            return lambda_helper.processCloseCallback(callback, "Failed", "I am sorry but we could not find the sales person " + sales);
         }
     }
 
     // Create the request into hubspot.
-    helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=hubspot_owner_id", "GET", null).then((data) => {
+    hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=hubspot_owner_id", "GET", null).then((data) => {
         var num_deals = 0;
         var content   = "";
 

@@ -2,7 +2,7 @@
 
 TODO (Write a description)
 
-## Commands
+## Commands (Variations of commands are available.)
 
 ### Tasks
 
