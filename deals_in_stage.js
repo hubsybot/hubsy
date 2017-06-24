@@ -1,11 +1,20 @@
-// API reference for this intent.
-// https://api.hubapi.com/deals/v1/deal/paged?hapikey=[Hubspot_API_Key]&properties=dealstage&properties=hubspot_owner_id
+/**
+ * Intent: DealsInStage
+ *
+ * Commands (Variations of commands are available. See Lex intent for details.)
+ *
+ * How many deals are in the `{stage}` stage.
+ * How many deals are in the `{stage}` assigned to `{sales}`.
+ *
+ * @TODO This is a paged call so we will need to work with multiple pages potentially.
+ * @TODO Put the stages and sales people's names inside of the config and loop through for validations.
+ */
 
 // Include the hubspot helper.
 const hubspot_helper = require(__dirname + "/hubspot_helper");
 const lambda_helper  = require(__dirname + "/lambda_helper");
 
-// Handler for the lambda function.
+// Handler for the Lambda function.
 exports.handler = (event, context, callback) => {
     // Stage information.
     var stage_guid = null;
@@ -55,7 +64,6 @@ exports.handler = (event, context, callback) => {
 
         // Loop through each of the deals and if one matches the id of the stage
         // then increase the counter.
-        // @TODO this is paged so we will need to work with multiple pages.
         data.deals.forEach((deal) => {
             if(deal.properties.dealstage.versions[0].value === stage_guid && sales_name === null) {
                 ++num_deals;
