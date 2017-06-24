@@ -53,12 +53,12 @@ data "aws_iam_policy_document" "ken_bot_lambda_assume_role_policy" {
 # Lambda
 #
 
-resource "aws_lambda_function" "testing1" {
-    filename = "./testing1.zip"
-    function_name = "testing1"
+resource "aws_lambda_function" "deals_in_stage" {
+    filename = "./deals_in_stage.zip"
+    function_name = "deals_in_stage"
     role = "${aws_iam_role.ken_bot.arn}"
-    handler = "testing1.handler"
-    source_code_hash = "${base64sha256(file("./testing1.zip"))}"
+    handler = "deals_in_stage.handler"
+    source_code_hash = "${base64sha256(file("./deals_in_stage.zip"))}"
     runtime = "${var.lambda-runtime}"
     memory_size = "${var.lambda-memory["low"]}"
     timeout = "${var.lambda-timeout["low"]}"
