@@ -18,15 +18,15 @@ exports.handler = (event, context, callback) => {
     // It's not exactly clear what stage name could come back in the slot
     // so we can just see if it includes one of our predefined ones. If it is not
     // found then process a failed callback.
-    if(stage.includes("discovery") === true) {
+    if(stage_name.includes("discovery") === true) {
         stage_guid = "a3984851-1f56-430b-b263-114bc22b3382";
-    } else if(stage.includes("quote") === true) {
+    } else if(stage_name.includes("quote") === true) {
         stage_guid = "db49bacc-bd60-411c-9aa8-0a6d7672ef5b";
-    } else if(stage.includes("negotiate") === true) {
+    } else if(stage_name.includes("negotiate") === true) {
         stage_guid = "ae7bc41b-d7c1-40a2-be38-fba6da1a9d73";
-    } else if(stage.includes("lost") === true) {
+    } else if(stage_name.includes("lost") === true) {
         stage_guid = "8a5b5eb3-8a8f-4f02-8b77-1c52c5854ec5";
-    } else if(stage.includes("won") === true) {
+    } else if(stage_name.includes("won") === true) {
         stage_guid = "1ee69bb3-ccc0-44a0-bf43-c6708087ce20";
     } else {
         return lambda_helper.processCloseCallback(callback, "I am sorry but we could not find the stage " + stage_name);
@@ -73,6 +73,6 @@ exports.handler = (event, context, callback) => {
 
         return lambda_helper.processCloseCallback(callback, "Fulfilled", content);
     }).catch((err) => {
-        console.error(err);
+        return lambda_helper.processCloseCallback(callback, "Failed", err.message);
     });
 };
