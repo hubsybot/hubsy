@@ -68,17 +68,7 @@ exports.handler = (event, context, callback) => {
             content = "There are " + num_deals + " in the " + stage + " stage.";
         }
 
-        // Respond to Lex.
-        callback(null, {
-            "dialogAction" : {
-                "type" : "Close",
-                "fulfillmentState" : "Fulfilled",
-                "message" : {
-                    "contentType" : "PlainText",
-                    "content" : content
-                }
-            }
-        });
+        return lambda_helper.processCloseCallback(callback, "Fulfilled", content);
     }).catch((err) => {
         console.error(err);
     });
