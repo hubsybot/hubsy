@@ -1,4 +1,4 @@
-TERRAFORM_VERSION := 0.9.6
+TERRAFORM_VERSION := 0.9.8
 REGION := us-east-1
 
 TERRAFORM := docker run --rm -it -e AWS_PROFILE=ken_bot -e AWS_REGION=${REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
@@ -22,5 +22,8 @@ build-lambda-functions:
 plan: build-lambda-functions init
 	${TERRAFORM} plan -out=.terraform/terraform.tfplan
 
-apply:
+apply: clean
 	${TERRAFORM} apply .terraform/terraform.tfplan
+
+clean:
+	rm *.zip
