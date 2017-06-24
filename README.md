@@ -5,8 +5,8 @@ TODO (Write a description)
 ## Commands
 
 ### Deals
-* How many deals are in the {stage} stage.
-* How many deals are in the {stage} assigned to {sales}.
+* How many deals are in the `{stage}` stage.
+* How many deals are in the `{stage}` assigned to `{sales}`.
 
 ## Contributing
 
