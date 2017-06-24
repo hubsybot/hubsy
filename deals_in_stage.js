@@ -17,13 +17,17 @@ exports.handler = (event, context, callback) => {
     // It's not exactly clear what stage name could come back in the slot
     // so we can just see if it includes one of our predefined ones.
     if(stage.includes("discovery") === true) {
-        stage_id = "appointmentscheduled";
-    } else if(stage.includes("presentation") === true) {
-        stage_id = "qualifiedtobuy";
+        stage_id = "a3984851-1f56-430b-b263-114bc22b3382";
     } else if(stage.includes("quote") === true) {
-        stage_id = "presentationscheduled";
-    } else if(stage.includes("negotite") === true) {
-        stage_id = "decisionmakerboughtin";
+        stage_id = "db49bacc-bd60-411c-9aa8-0a6d7672ef5b";
+    } else if(stage.includes("negotiate") === true) {
+        stage_id = "ae7bc41b-d7c1-40a2-be38-fba6da1a9d73";
+    } else if(stage.includes("lost") === true) {
+        stage_id = "8a5b5eb3-8a8f-4f02-8b77-1c52c5854ec5";
+    } else if(stage.includes("won") === true) {
+        stage_id = "1ee69bb3-ccc0-44a0-bf43-c6708087ce20";
+    } else {
+        // @TODO Process callback and fail because it is not found.
     }
 
     // If there is a sales slot configured check to see who it is if is none of the
@@ -36,8 +40,7 @@ exports.handler = (event, context, callback) => {
         } else if(sales.includes("andy") === true) {
             sales_email = "andrewpuch@gmail.com";
         } else {
-            sales       = null;
-            sales_email = null;
+            // @TODO Process callback and fail because it is not found.
         }
     }
 
@@ -57,6 +60,7 @@ exports.handler = (event, context, callback) => {
             }
         });
 
+        // Build the content to send back to Lex.
         if(sales !== null) {
             content = "There are " + num_deals + " in the " + stage + " stage assigned to " + sales;
         } else {

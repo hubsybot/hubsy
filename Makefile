@@ -1,10 +1,14 @@
+# Configuration variables.
 TERRAFORM_VERSION := 0.9.8
 REGION := us-east-1
 
+# Launch Terraform in a isolated docker container.
 TERRAFORM := docker run --rm -it -e AWS_PROFILE=ken_bot -e AWS_REGION=${REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
 
+# Default will be just to do a Terraform plan.
 default: plan
 
+# Initialize the Terraform backend.
 init:
 	rm -rf .terraform && \
 	${TERRAFORM} init \
@@ -15,13 +19,18 @@ init:
 		-backend-config="profile=ken_bot" \
 		-force-copy
 
-build-lambda-functions:
+# Build the Lambda functions and zip them up to have Terraform ship to Lambda.
+build:
 	npm install && \
 	zip ken_bot.zip -r *.js node_modules config
 
-plan: build-lambda-functions init
+# Planning will build the Lambda functions, initialize Terraform backend and then
+# do a Terraform plan.
+plan: build init
 	${TERRAFORM} plan -out=.terraform/terraform.tfplan
 
+# Run a Terraform apply against the plan that was ran. It will also do a little
+# cleanup and remove any zip files it created.
 apply:
 	${TERRAFORM} apply .terraform/terraform.tfplan && \
 	rm *.zip
