@@ -17,13 +17,11 @@ init:
 
 build-lambda-functions:
 	npm install && \
-	zip testing1.zip -r *.js node_modules config
+	zip ken_bot.zip -r *.js node_modules config
 
 plan: build-lambda-functions init
 	${TERRAFORM} plan -out=.terraform/terraform.tfplan
 
-apply: clean
-	${TERRAFORM} apply .terraform/terraform.tfplan
-
-clean:
+apply:
+	${TERRAFORM} apply .terraform/terraform.tfplan && \
 	rm *.zip
