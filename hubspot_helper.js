@@ -3,6 +3,7 @@ const config   = require(__dirname + "/config/config.json");
 const request  = require("request");
 const bluebird = require("bluebird");
 
+// Simple wrapper for creating a request in Node.
 exports.createRequest = (path, method, body) => {
     // Setup the options for the request.
     var options = {
