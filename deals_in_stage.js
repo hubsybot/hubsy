@@ -18,6 +18,8 @@ exports.handler = (event, context, callback) => {
         id = "decisionmakerboughtin";
     }
 
+    console.log(event.currentIntent.slots);
+
     // Create the request into hubspot.
     helper.createRequest("/deals/v1/deal/paged?properties=dealstage", "GET", null).then((data) => {
         var num_deals = 0;
