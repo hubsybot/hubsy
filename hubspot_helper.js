@@ -5,7 +5,7 @@ const bluebird = require("bluebird");
 
 exports.createRequest = (path, method, body) => {
     // Setup the options for the request.
-    let options = {
+    var options = {
         "url"    : config.hubspot.base_url + path + "?hapikey=" + config.hubspot.api_key,
         "method" : method
     };

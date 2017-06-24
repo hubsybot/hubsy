@@ -1,7 +1,7 @@
 const helper = require(__dirname + "/hubspot_helper");
 
 exports.handler = (event, context, callback) => {
-    helper.createRequest("/deals/v1/pipelines", "GET", null).then(function(data) {
+    helper.createRequest("/deals/v1/pipelines", "GET", null).then((data) => {
         var response = "";
 
         data[0].stages.forEach((stage) => {
