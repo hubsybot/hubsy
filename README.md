@@ -2,7 +2,13 @@
 
 TODO (Write a description)
 
-## Usage
+## Commands
+
+### Deals
+* How many deals are in the {stage} stage.
+* How many deals are in the {stage} assigned to {sales}.
+
+## Contributing
 
 * `make test`  - TODO (Run ESLint against Node 6.10)
 * `make build` - Zips the Lambda functions for terraform to send to Lambda.
