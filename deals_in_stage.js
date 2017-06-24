@@ -7,10 +7,10 @@
  * How many deals are in the `{stage}` assigned to `{sales}`.
  *
  * @TODO This is a paged call so we will need to work with multiple pages potentially.
- * @TODO Put the stages and sales people's names inside of the config and loop through for validations.
  */
 
-// Include the hubspot helper.
+// Include the config and helpers.
+const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/hubspot_helper");
 const lambda_helper  = require(__dirname + "/lambda_helper");
 
@@ -25,20 +25,16 @@ exports.handler = (event, context, callback) => {
     var sales_name  = null;
 
     // It's not exactly clear what stage name could come back in the slot
-    // so we can just see if it includes one of our predefined ones. If it is not
-    // found then process a failed callback.
-    if(stage_name.includes("discovery") === true) {
-        stage_guid = "a3984851-1f56-430b-b263-114bc22b3382";
-    } else if(stage_name.includes("quote") === true) {
-        stage_guid = "db49bacc-bd60-411c-9aa8-0a6d7672ef5b";
-    } else if(stage_name.includes("negotiate") === true) {
-        stage_guid = "ae7bc41b-d7c1-40a2-be38-fba6da1a9d73";
-    } else if(stage_name.includes("lost") === true) {
-        stage_guid = "8a5b5eb3-8a8f-4f02-8b77-1c52c5854ec5";
-    } else if(stage_name.includes("won") === true) {
-        stage_guid = "1ee69bb3-ccc0-44a0-bf43-c6708087ce20";
-    } else {
-        return lambda_helper.processCloseCallback(callback, "I am sorry but we could not find the stage " + stage_name);
+    // so we can just see if it includes one of our predefined ones.
+    config.stages.forEach((stage) => {
+        if(stage_name.includes(stage.name) === true) {
+            stage_guid = stage.guid;
+        }
+    });
+
+    // If it is not found then process a failed callback.
+    if(stage_guid === null) {
+        return lambda_helper.processCloseCallback(callback, "Failed", "I am sorry but we could not find the stage " + stage_name);
     }
 
     // If there is a sales slot configured check to see who it is if is none of the
@@ -46,13 +42,15 @@ exports.handler = (event, context, callback) => {
     if(event.currentIntent.slots.sales !== null) {
         sales_name = event.currentIntent.slots.sales;
 
-        // We will check for both first and last name. If the name got through and
-        // it is not found then just process a failed callback.
-        if(sales_name.includes("john") === true || sales_name.includes("wetzel") === true) {
-            sales_email = "johnswetzel@gmail.com";
-        } else if(sales_name.includes("andy") === true || sales_name.includes("puch") === true) {
-            sales_email = "andrewpuch@gmail.com";
-        } else {
+        // Loop through sales people and check for both first and last name.
+        config.sales_people.forEach((person) => {
+            if(sales_name.includes(person.first) === true || sales_name.includes(person.last) === true) {
+                sales_email = person.email;
+            }
+        });
+
+        // If the name got through and it is not found then just process a failed callback.
+        if(sales_email === null) {
             return lambda_helper.processCloseCallback(callback, "Failed", "I am sorry but we could not find the sales person " + sales_name);
         }
     }

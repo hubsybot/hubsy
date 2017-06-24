@@ -2,5 +2,18 @@
     "hubspot" : {
         "api_key" : "",
         "base_url" : ""
-    }
+    },
+    "sales_people" : [
+        {
+            "first" : "",
+            "last" : "",
+            "email" : ""
+        }
+    ],
+    "stages" : [
+        {
+            "name" : "",
+            "guid" : ""
+        }
+    ]
 }
