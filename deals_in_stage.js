@@ -36,9 +36,9 @@ exports.handler = (event, context, callback) => {
     if(event.currentIntent.slots.sales !== null) {
         sales = event.currentIntent.slots.sales;
 
-        if(sales.includes("john") === true) {
+        if(sales.includes("john") === true || sales.includes("wetzel") === true) {
             sales_email = "johnswetzel@gmail.com";
-        } else if(sales.includes("andy") === true) {
+        } else if(sales.includes("andy") === true || sales.includes("puch") === true) {
             sales_email = "andrewpuch@gmail.com";
         } else {
             return lambda_helper.processCloseCallback(callback, "Failed", "I am sorry but we could not find the sales person " + sales);
