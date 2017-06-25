@@ -45,7 +45,8 @@ exports.handler = (event, context, callback) => {
             }
         });
 
-        content = content + total_amount + "dollars.";
+        // Build the content to send back to Lex.
+        content = content + total_amount + " dollars.";
 
         return lambda_helper.processCloseCallback(callback, "Fulfilled", content);
     }).catch((err) => {
