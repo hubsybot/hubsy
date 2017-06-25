@@ -9,7 +9,6 @@ TODO (Write a description)
 ### Deals
 * How many deals are in the `{stage}` stage.
 * How many deals are in the `{stage}` assigned to `{sales}`.
-
 * What is the total value of deals in the `{stage}​` stage.
 * How much money is in `{stage}​`.
 

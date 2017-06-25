@@ -63,9 +63,9 @@ exports.handler = (event, context, callback) => {
         // Loop through each of the deals and if one matches the id of the stage
         // then increase the counter.
         data.deals.forEach((deal) => {
-            if(deal.properties.dealstage.versions[0].value === stage_guid && sales_name === null) {
+            if(deal.properties.dealstage.value === stage_guid && sales_name === null) {
                 ++num_deals;
-            } else if(deal.properties.dealstage.versions[0].value === stage_guid && sales_name !== null && deal.properties.hubspot_owner_id.sourceId === sales_email) {
+            } else if(deal.properties.dealstage.value === stage_guid && sales_name !== null && deal.properties.hubspot_owner_id.sourceId === sales_email) {
                 ++num_deals;
             }
         });
