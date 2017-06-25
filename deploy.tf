@@ -30,6 +30,11 @@ resource "aws_cloudwatch_log_group" "deals_in_stage" {
     retention_in_days = "${var.cloudwatch-log-retention}"
 }
 
+resource "aws_cloudwatch_log_group" "total_in_deals" {
+    name = "/aws/lambda/total_in_deals"
+    retention_in_days = "${var.cloudwatch-log-retention}"
+}
+
 #
 # Roles
 #
@@ -66,6 +71,17 @@ resource "aws_lambda_function" "deals_in_stage" {
     function_name = "deals_in_stage"
     role = "${aws_iam_role.ken_bot.arn}"
     handler = "deals_in_stage.handler"
+    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    runtime = "${var.lambda-runtime}"
+    memory_size = "${var.lambda-memory["low"]}"
+    timeout = "${var.lambda-timeout["low"]}"
+}
+
+resource "aws_lambda_function" "total_in_deals" {
+    filename = "./ken_bot.zip"
+    function_name = "total_in_deals"
+    role = "${aws_iam_role.ken_bot.arn}"
+    handler = "total_in_deals.handler"
     source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
     runtime = "${var.lambda-runtime}"
     memory_size = "${var.lambda-memory["low"]}"

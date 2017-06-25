@@ -10,6 +10,9 @@ TODO (Write a description)
 * How many deals are in the `{stage}` stage.
 * How many deals are in the `{stage}` assigned to `{sales}`.
 
+* What is the total value of deals in the `{stage}​` stage.
+* How much money is in `{stage}​`.
+
 ## Contributing
 
 * `make test`  - TODO (Run ESLint against Node 6.10)
