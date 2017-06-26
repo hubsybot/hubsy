@@ -69,7 +69,7 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
                 },
                 card : {
                     type : 'Simple',
-                    title : "testing",
+                    title : "Ken Bot",
                     content : message,
                 },
                 shouldEndSession : true,
