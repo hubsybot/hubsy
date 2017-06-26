@@ -8,14 +8,16 @@ terraform { backend "s3" { } }
 # Configuration
 #
 
-variable "cloudwatch-log-retention" { default = 7 }
-variable "lambda-runtime" { default = "nodejs6.10" }
-variable "lambda-memory" { default = {
+variable "aws_account_id" { default = "012581555088" }
+variable "aws_region" { type = "string" }
+variable "cloudwatch_log_retention" { default = 7 }
+variable "lambda_runtime" { default = "nodejs6.10" }
+variable "lambda_memory" { default = {
     low = "128"
     medium = "256"
     high = "512"
 }}
-variable "lambda-timeout" { default = {
+variable "lambda_timeout" { default = {
     low = "30"
     medium = "60"
     high = "120"
@@ -27,12 +29,12 @@ variable "lambda-timeout" { default = {
 
 resource "aws_cloudwatch_log_group" "deals_in_stage" {
     name = "/aws/lambda/deals_in_stage"
-    retention_in_days = "${var.cloudwatch-log-retention}"
+    retention_in_days = "${var.cloudwatch_log_retention}"
 }
 
 resource "aws_cloudwatch_log_group" "total_in_deals" {
     name = "/aws/lambda/total_in_deals"
-    retention_in_days = "${var.cloudwatch-log-retention}"
+    retention_in_days = "${var.cloudwatch_log_retention}"
 }
 
 #
@@ -72,9 +74,9 @@ resource "aws_lambda_function" "deals_in_stage" {
     role = "${aws_iam_role.ken_bot.arn}"
     handler = "deals_in_stage.handler"
     source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
-    runtime = "${var.lambda-runtime}"
-    memory_size = "${var.lambda-memory["low"]}"
-    timeout = "${var.lambda-timeout["low"]}"
+    runtime = "${var.lambda_runtime}"
+    memory_size = "${var.lambda_memory["low"]}"
+    timeout = "${var.lambda_timeout["low"]}"
 }
 
 resource "aws_lambda_function" "total_in_deals" {
@@ -83,7 +85,45 @@ resource "aws_lambda_function" "total_in_deals" {
     role = "${aws_iam_role.ken_bot.arn}"
     handler = "total_in_deals.handler"
     source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
-    runtime = "${var.lambda-runtime}"
-    memory_size = "${var.lambda-memory["low"]}"
-    timeout = "${var.lambda-timeout["low"]}"
+    runtime = "${var.lambda_runtime}"
+    memory_size = "${var.lambda_memory["low"]}"
+    timeout = "${var.lambda_timeout["low"]}"
+}
+
+#
+# Permissions
+#
+
+# Deals In Stage
+
+resource "aws_lambda_permission" "deals_in_stage_lex" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.deals_in_stage.function_name}"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.deals_in_stage.function_name}"
+    principal = "lex.amazonaws.com"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.deals_in_stage.function_name}:*"
+}
+
+resource "aws_lambda_permission" "deals_in_stage_alexa" {
+    statement_id = "deals_in_stage_alexa"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.deals_in_stage.function_name}"
+    principal = "alexa-appkit.amazon.com"
+}
+
+# Total In Deals
+
+resource "aws_lambda_permission" "total_in_deals_lex" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.total_in_deals.function_name}"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.total_in_deals.function_name}"
+    principal = "lex.amazonaws.com"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.total_in_deals.function_name}:*"
+}
+
+resource "aws_lambda_permission" "total_in_deals_alexa" {
+    statement_id = "total_in_deals_alexa"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.total_in_deals.function_name}"
+    principal = "alexa-appkit.amazon.com"
 }

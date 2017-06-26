@@ -1,9 +1,9 @@
 # Configuration variables.
 TERRAFORM_VERSION := 0.9.8
-REGION := us-east-1
+AWS_REGION := us-east-1
 
 # Launch Terraform in a isolated docker container.
-TERRAFORM := docker run --rm -it -e AWS_PROFILE=ken_bot -e AWS_REGION=${REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
+TERRAFORM := docker run --rm -it -e AWS_PROFILE=ken_bot -e AWS_REGION=${AWS_REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
 
 # Default will be just to do a Terraform plan.
 default: plan
@@ -13,9 +13,9 @@ init:
 	rm -rf .terraform && \
 	${TERRAFORM} init \
 		-backend=true \
-		-backend-config="bucket=ken-bot" \
+		-backend-config="bucket=ken-bot-terraform" \
 		-backend-config="key=ken-bot/terraform.tfstate" \
-		-backend-config="region=${REGION}" \
+		-backend-config="region=${AWS_REGION}" \
 		-backend-config="profile=ken_bot" \
 		-force-copy
 
@@ -27,7 +27,7 @@ build:
 # Planning will build the Lambda functions, initialize Terraform backend and then
 # do a Terraform plan.
 plan: build init
-	${TERRAFORM} plan -out=.terraform/terraform.tfplan
+	${TERRAFORM} plan -var="aws_region=${AWS_REGION}" -out=.terraform/terraform.tfplan
 
 # Run a Terraform apply against the plan that was ran. It will also do a little
 # cleanup and remove any zip files it created.
