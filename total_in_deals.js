@@ -10,14 +10,16 @@
 
 // Include the config and helpers.
 const config         = require(__dirname + "/config/config.json");
-const hubspot_helper = require(__dirname + "/hubspot_helper");
-const lambda_helper  = require(__dirname + "/lambda_helper");
+const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
+const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 
 // Handler for the Lambda function.
 exports.handler = (event, context, callback) => {
+    var slots = lambda_helper.parseSlots(event);
+
     // Stage information.
     var stage_guid = null;
-    var stage_name = event.currentIntent.slots.stage;
+    var stage_name = slots.stage.value;
 
     // It's not exactly clear what stage name could come back in the slot
     // so we can just see if it includes one of our predefined ones.
@@ -29,7 +31,7 @@ exports.handler = (event, context, callback) => {
 
     // If it is not found then process a failed callback.
     if(stage_guid === null) {
-        return lambda_helper.processCloseCallback(callback, "Failed", "I am sorry but we could not find the stage " + stage_name);
+        return lambda_helper.processCallback(callback, event, "Failed", "I am sorry but we could not find the stage " + stage_name);
     }
 
     // Create the request into hubspot using the helper.
@@ -48,8 +50,8 @@ exports.handler = (event, context, callback) => {
         // Build the content to send back to Lex.
         content = content + total_amount + " dollars.";
 
-        return lambda_helper.processCloseCallback(callback, "Fulfilled", content);
+        return lambda_helper.processCallback(callback, event, "Fulfilled", content);
     }).catch((err) => {
-        return lambda_helper.processCloseCallback(callback, "Failed", err.message);
+        return lambda_helper.processCallback(callback, event, "Failed", err.message);
     });
 };
