@@ -1,10 +1,14 @@
 # Ken Bot
+Proprosed name (Hubbot | HubBot | hubspotbot | hubspotBot)
 
 TODO (Write a description)
 
 ## Commands (Variations of commands are available.)
 
-### Tasks
+### Engagements (Notes, Meetings, Calls, Emails, Tasks)
+* How many `{engagements}` did `{sales}` make `{timeframe}`
+* How many `{engagements}` did `{sales}` make on `{date}`
+* How many `{engagements}` were made on `{date}`
 
 ### Deals
 * How many deals are in the `{stage}` stage.

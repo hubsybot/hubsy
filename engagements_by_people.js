@@ -40,7 +40,9 @@ var message          = "";
 exports.handler = (event, context, callback) => {
     var slots = lambda_helper.parseSlots(event);
     console.log("engagements", slots.engagements.value)
+    console.log("sales", slots.sales.value)
     console.log("timeframe", slots.timeframe.value)
+    console.log("date", slots.date.value)
 
     // Engagement information.
     var engagement_raw       = slots.engagements.value;
@@ -126,7 +128,7 @@ exports.handler = (event, context, callback) => {
     var slot_timeframe = null;
     var timeframe_obj = null;
 
-    // Make sure we can understand the provided timeframe.
+    // Make sure we can understand the provided relative timeframe.
     if(slots.timeframe.value !== null) {
         slot_timeframe = slots.timeframe.value;
         // Pass through time helper to get more information about slot time.
@@ -143,7 +145,23 @@ exports.handler = (event, context, callback) => {
             console.log(message);
             return lambda_helper.processCallback(callback, event, "Failed", message);
         }
-    // Provide a default timeframe of today.
+    // Check to see if an exact date was provided.
+    } else if(slots.date.value !== null) {
+        slot_timeframe = slots.date.value;
+        // Pass through time helper to get more information about slot time.
+        var timeframe_obj = time_helper.timeframe_check(slot_timeframe); 
+        if(timeframe_obj === false) {
+            message = `
+            ${slot_timeframe} sounds like it may be in the twilight zone...
+                Please say something like:
+                today
+                yesterday
+                last week
+                this month
+            `;        
+            console.log(message);
+            return lambda_helper.processCallback(callback, event, "Failed", message);
+        }
     } else {
         slot_timeframe = "today";
         // Pass through time helper to get more information about slot time.

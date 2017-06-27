@@ -10,12 +10,17 @@ var time_between = (timestamp, low_timestamp, high_timestamp) => {return timesta
 // It's not exactly clear what timeframe could come back in the slot
 // so we can just see if it includes one of our predefined ones.
 exports.timeframe_check = slot_timeframe => {
-    if(1 + 1 === 3) {
-        moment(slot_timeframe).isValid()
+    if(moment(slot_timeframe, 'YYYY-MM-DD', true).isValid() === true) {
+        timeframe_obj = {
+            "operator" : time_equal,
+            "comparable" : moment(slot_timeframe).startOf('date'),
+            "range" : false
+            }
+
         console.log(`A valid exact date of ${slot_timeframe} was passed in from user.`)
         // We arent accounting for exact dates just yet
         // so we will skip for now.
-        return false
+        return timeframe_obj
     // If not, check to see if it is listed in config.
     } else {
         var timeframe_obj = false;
