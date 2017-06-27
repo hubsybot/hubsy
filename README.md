@@ -16,6 +16,18 @@ TODO (Write a description)
 * What is the total value of deals in the `{stage}​` stage.
 * How much money is in `{stage}​`.
 
+## AWS/Amazon Services Used
+* EC2 Container Registry - Stores our Docker image for summarizing.
+* EC2 Container Service - Runs our Docker tasks on a schedule.
+* Lex - Powers our bot.
+* Lambda - Runs our code in the cloud for Lex.
+* IAM - Profiles for our Lambda functions.
+* Elasticsearch Service - Where we store and report our historical HubSpot data.
+* CloudWatch Logs - Where our logs go for our Lambda functions.
+* Amazon Alexa Skill Developer - Area where we develop our Alexa skill.
+* Route 53 - Where we registered our bot domain.
+* S3 - Where we store our Terraform state as well as our static homepage.
+
 ## Contributing
 
 * `make test`  - TODO (Run ESLint against Node 6.10)
