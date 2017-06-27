@@ -30,7 +30,7 @@ var message          = "";
 //     "currentIntent": {
 //         "slots": {
 //             "sales": null,
-//             "engagements": "dicks",
+//             "engagements": "calls",
 //             "timeframe": "this week"
 //         }
 //     }
@@ -38,11 +38,12 @@ var message          = "";
 
 // Handler for the Lambda function.
 exports.handler = (event, context, callback) => {
-    console.log("engagements", event.currentIntent.slots.engagements)
-    console.log("timeframe", event.currentIntent.slots.timeframe)
+    var slots = lambda_helper.parseSlots(event);
+    console.log("engagements", slots.engagements.value)
+    console.log("timeframe", slots.timeframe.value)
 
     // Engagement information.
-    var engagement_raw       = event.currentIntent.slots.engagements;
+    var engagement_raw       = slots.engagements.value;
     var engagement_valid     = false;
     var possible_engagements = [
         {
@@ -102,8 +103,8 @@ exports.handler = (event, context, callback) => {
 
     // If there is a sales slot configured check to see who it is if is none of the
     // ones provided it was invalid and we can null the rest out.
-    if(event.currentIntent.slots.sales !== null) {
-        sales_name = event.currentIntent.slots.sales;
+    if(slots.sales.value !== null) {
+        sales_name = slots.sales.value;
 
         // Loop through sales people and check for both first and last name.
         config.sales_people.forEach((person) => {
@@ -126,8 +127,8 @@ exports.handler = (event, context, callback) => {
     var timeframe_obj = null;
 
     // Make sure we can understand the provided timeframe.
-    if(event.currentIntent.slots.timeframe !== null) {
-        slot_timeframe = event.currentIntent.slots.timeframe;
+    if(slots.timeframe.value !== null) {
+        slot_timeframe = slots.timeframe.value;
         // Pass through time helper to get more information about slot time.
         var timeframe_obj = time_helper.timeframe_check(slot_timeframe); 
         if(timeframe_obj === false) {
