@@ -112,7 +112,7 @@ exports.handler = (event, context, callback) => {
         config.sales_people.forEach((person) => {
             if(sales_name.includes(person.first) === true || sales_name.includes(person.last) === true) {
                 sales_email = person.email;
-                owner_id = person.ownerId;
+                owner_id = parseInt(person.ownerId);
             }
         });
 
@@ -186,6 +186,10 @@ exports.handler = (event, context, callback) => {
             } else {
                 timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable_low, timeframe_obj.comparable_high);
             }
+
+            // Test cases
+            console.log("engagement type", engagement.engagement.type === engagement_type,
+                "timeframe in range", timeframe_in_range, "ownerId", engagement.engagement.ownerId === owner_id)
 
             // Test to see if engagement meets criteria provided by slots.
             if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name === null) {
