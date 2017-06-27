@@ -24,7 +24,11 @@ exports.handler = (event, context, callback) => {
 
     // Sales information.
     var sales_email = null;
-    var sales_name  = slots.sales.value;
+    var sales_name  = null;
+
+    if(slots.sales.value !== null) {
+        sales_name = slots.sales.value;
+    }
 
     // It's not exactly clear what stage name could come back in the slot
     // so we can just see if it includes one of our predefined ones.

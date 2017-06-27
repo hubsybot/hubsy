@@ -37,6 +37,11 @@ resource "aws_cloudwatch_log_group" "total_in_deals" {
     retention_in_days = "${var.cloudwatch_log_retention}"
 }
 
+resource "aws_cloudwatch_log_group" "alexa_router" {
+    name = "/aws/lambda/alexa_router"
+    retention_in_days = "${var.cloudwatch_log_retention}"
+}
+
 #
 # Roles
 #
@@ -90,6 +95,17 @@ resource "aws_lambda_function" "total_in_deals" {
     timeout = "${var.lambda_timeout["low"]}"
 }
 
+resource "aws_lambda_function" "alexa_router" {
+    filename = "./ken_bot.zip"
+    function_name = "alexa_router"
+    role = "${aws_iam_role.ken_bot.arn}"
+    handler = "alexa_router.handler"
+    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    runtime = "${var.lambda_runtime}"
+    memory_size = "${var.lambda_memory["low"]}"
+    timeout = "${var.lambda_timeout["low"]}"
+}
+
 #
 # Permissions
 #
@@ -104,13 +120,6 @@ resource "aws_lambda_permission" "deals_in_stage_lex" {
     source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.deals_in_stage.function_name}:*"
 }
 
-resource "aws_lambda_permission" "deals_in_stage_alexa" {
-    statement_id = "deals_in_stage_alexa"
-    action = "lambda:InvokeFunction"
-    function_name = "${aws_lambda_function.deals_in_stage.function_name}"
-    principal = "alexa-appkit.amazon.com"
-}
-
 # Total In Deals
 
 resource "aws_lambda_permission" "total_in_deals_lex" {
@@ -121,9 +130,11 @@ resource "aws_lambda_permission" "total_in_deals_lex" {
     source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.total_in_deals.function_name}:*"
 }
 
-resource "aws_lambda_permission" "total_in_deals_alexa" {
-    statement_id = "total_in_deals_alexa"
+# Alexa
+
+resource "aws_lambda_permission" "alexa_router" {
+    statement_id = "alexa_router"
     action = "lambda:InvokeFunction"
-    function_name = "${aws_lambda_function.total_in_deals.function_name}"
+    function_name = "${aws_lambda_function.alexa_router.function_name}"
     principal = "alexa-appkit.amazon.com"
 }
