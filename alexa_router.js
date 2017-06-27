@@ -7,6 +7,9 @@ exports.handler = (event, context, callback) => {
     var intent = null;
 
     switch(event.request.intent.name) {
+        case "EngagementsByPeople":
+            intent = require(__dirname + "/engagements_by_people");
+            break;        
         case "DealsInStage":
             intent = require(__dirname + "/deals_in_stage");
             break;
