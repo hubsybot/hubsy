@@ -16,5 +16,8 @@
             "name" : "",
             "guid" : ""
         }
-    ]
+    ],
+    "elasticsearch" : {
+        "host" : ""
+    }
 }

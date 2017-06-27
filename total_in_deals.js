@@ -43,7 +43,7 @@ exports.handler = (event, context, callback) => {
         // then increase the counter.
         data.deals.forEach((deal) => {
             if(deal.properties.dealstage.value === stage_guid) {
-                total_amount += parseInt(deal.properties.amount.value);
+                total_amount += parseFloat(deal.properties.amount.value);
             }
         });
 
