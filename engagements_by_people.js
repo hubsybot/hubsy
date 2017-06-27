@@ -92,7 +92,7 @@ exports.handler = (event, context, callback) => {
             tasks
         `;
         console.log(message);
-        return lambda_helper.processCloseCallback(callback, "Failed", message);
+        return lambda_helper.processCallback(callback, "Failed", message);
     }
 
     // Sales information.
@@ -117,7 +117,7 @@ exports.handler = (event, context, callback) => {
         if(owner_id === null) {
             message = `I am sorry but we could not find the sales person ${sales_name}`;
             console.log(message);
-            return lambda_helper.processCloseCallback(callback, "Failed", message);
+            return lambda_helper.processCallback(callback, "Failed", message);
         }
     }
 
@@ -140,7 +140,7 @@ exports.handler = (event, context, callback) => {
                 this month
             `;        
             console.log(message);
-            return lambda_helper.processCloseCallback(callback, "Failed", message);
+            return lambda_helper.processCallback(callback, "Failed", message);
         }
     // Provide a default timeframe of today.
     } else {
@@ -185,9 +185,9 @@ exports.handler = (event, context, callback) => {
         }
 
         console.log(content);
-        return lambda_helper.processCloseCallback(callback, "Fulfilled", content);
+        return lambda_helper.processCallback(callback, "Fulfilled", content);
     }).catch((err) => {
     	console.log(err);
-        return lambda_helper.processCloseCallback(callback, "Failed", err.message);
+        return lambda_helper.processCallback(callback, "Failed", err.message);
     });
 };
