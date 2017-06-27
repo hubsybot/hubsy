@@ -27,6 +27,8 @@ TODO (Write a description)
 * Amazon Alexa Skill Developer - Area where we develop our Alexa skill.
 * Route 53 - Where we registered our bot domain.
 * S3 - Where we store our Terraform state as well as our static homepage.
+* CloudFront - Caches our website.
+* Certificate Manager - Gives us the SSL certificate.
 
 ## Contributing
 
