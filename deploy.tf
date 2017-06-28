@@ -27,6 +27,11 @@ variable "lambda_timeout" { default = {
 # CloudWatch Logs
 #
 
+resource "aws_cloudwatch_log_group" "contact_info" {
+    name = "/aws/lambda/contact_info"
+    retention_in_days = "${var.cloudwatch_log_retention}"
+}
+
 resource "aws_cloudwatch_log_group" "deals_in_stage" {
     name = "/aws/lambda/deals_in_stage"
     retention_in_days = "${var.cloudwatch_log_retention}"
@@ -79,6 +84,17 @@ resource "aws_iam_policy_attachment" "ken_bot_attachment" {
 # Lambda
 #
 
+resource "aws_lambda_function" "contact_info" {
+    filename = "./ken_bot.zip"
+    function_name = "contact_info"
+    role = "${aws_iam_role.ken_bot.arn}"
+    handler = "contact_info.handler"
+    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    runtime = "${var.lambda_runtime}"
+    memory_size = "${var.lambda_memory["low"]}"
+    timeout = "${var.lambda_timeout["low"]}"
+}
+
 resource "aws_lambda_function" "deals_in_stage" {
     filename = "./ken_bot.zip"
     function_name = "deals_in_stage"
@@ -126,6 +142,16 @@ resource "aws_lambda_function" "alexa_router" {
 #
 # Permissions
 #
+
+# Contact Info
+
+resource "aws_lambda_permission" "contact_info_lex" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.contact_info.function_name}"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.contact_info.function_name}"
+    principal = "lex.amazonaws.com"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.contact_info.function_name}:*"
+}
 
 # Engagements By People
 
