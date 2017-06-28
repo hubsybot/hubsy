@@ -12,6 +12,7 @@
     "bluebird": "^3.5.0",
     "elasticsearch": "^13.2.0",
     "moment": "^2.18.1",
-    "request": "^2.81.0"
+    "request": "^2.81.0",
+    "string-similarity": "^1.2.0"
   }
 }
