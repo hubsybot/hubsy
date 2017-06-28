@@ -3,7 +3,7 @@ const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const similarity     = require("string-similarity");
 
 hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=dealname&properties=hubspot_owner_id", "GET", null).then((body) => {
-    var str = "give me the deal for basketball all stars";
+    var str = "house of worship church";
 
     body.forEach((data) => {
         data.deals.forEach((deal) => {
