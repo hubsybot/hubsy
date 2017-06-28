@@ -7,14 +7,14 @@
  * 	engagement_type : {NOTE, EMAIL, TASK, MEETING, or CALL}
  *  sales_name :      {null, andrew, andy, john}
  *  timeframe :       {today, yesterday, this week, last week, this month, last month, this year} | Defaults to today
- * 
+ *
  * How many {engagements} have been made?
  * How many {engagements} were made {timeframe}?
  * How many {enagagments} did {sales} make {timeframe}?
  */
 
  /** NOTES ON ENGAGEMENTS
- * Engagements are used to store data from CRM actions, including notes, 
+ * Engagements are used to store data from CRM actions, including notes,
  * tasks, meetings, and calls specfied under engagement.type
 */
 
@@ -69,7 +69,7 @@ exports.handler = (event, context, callback) => {
     var format_engagement = engagement_raw => {
         // If engagement slot provided is plural, make singular.
         if(engagement_raw[engagement_raw.length -1] === 's') {
-            engagement_raw = engagement_raw.slice(0, -1); 
+            engagement_raw = engagement_raw.slice(0, -1);
         }
         // Capitalize to match output from Hubspot API.
         return engagement_raw.toUpperCase();
@@ -82,7 +82,7 @@ exports.handler = (event, context, callback) => {
         if(engagement_type.includes(engagement.name) === true) {
             engagement_type = engagement.name;
             engagement_valid = true;
-        } 
+        }
     });
 
     if(engagement_valid === false) {
@@ -132,7 +132,7 @@ exports.handler = (event, context, callback) => {
     if(slots.timeframe.value !== null) {
         slot_timeframe = slots.timeframe.value;
         // Pass through time helper to get more information about slot time.
-        var timeframe_obj = time_helper.timeframe_check(slot_timeframe); 
+        var timeframe_obj = time_helper.timeframe_check(slot_timeframe);
         if(timeframe_obj === false) {
             message = `
             ${slot_timeframe} sounds like it may be in the twilight zone...
@@ -141,7 +141,7 @@ exports.handler = (event, context, callback) => {
                 yesterday
                 last week
                 this month
-            `;        
+            `;
             console.log(message);
             return lambda_helper.processCallback(callback, event, "Failed", message);
         }
@@ -149,7 +149,7 @@ exports.handler = (event, context, callback) => {
     } else if(slots.date.value !== null) {
         slot_timeframe = slots.date.value;
         // Pass through time helper to get more information about slot time.
-        var timeframe_obj = time_helper.timeframe_check(slot_timeframe); 
+        var timeframe_obj = time_helper.timeframe_check(slot_timeframe);
         if(timeframe_obj === false) {
             message = `
             ${slot_timeframe} sounds like it may be in the twilight zone...
@@ -158,7 +158,7 @@ exports.handler = (event, context, callback) => {
                 yesterday
                 last week
                 this month
-            `;        
+            `;
             console.log(message);
             return lambda_helper.processCallback(callback, event, "Failed", message);
         }
@@ -180,7 +180,7 @@ exports.handler = (event, context, callback) => {
                 var timestamp = moment(engagement.engagement.timestamp).startOf('date');
                 // Test to see if engagement's timestamp is within requested range.
                 var timeframe_in_range = false;
-                
+
                 if(timeframe_obj.range === false) {
                     timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable);
                 // In case there is a range of timeframes (ie. last week)
@@ -195,7 +195,7 @@ exports.handler = (event, context, callback) => {
                 // Test to see if engagement meets criteria provided by slots.
                 if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name === null) {
                     ++num_engagements;
-                } else if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name !== null 
+                } else if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name !== null
                     && engagement.engagement.ownerId === owner_id) {
                         ++num_engagements;
                 }
@@ -209,10 +209,8 @@ exports.handler = (event, context, callback) => {
             content = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${slot_timeframe}.`;
         }
 
-        console.log(content);
         return lambda_helper.processCallback(callback, event, "Fulfilled", content);
     }).catch((err) => {
-    	console.log(err);
         return lambda_helper.processCallback(callback, event, "Failed", err.message);
     });
 };
