@@ -39,6 +39,9 @@ exports.parseSlots = (event) => {
 
 // Wrapper for making a closing callback to Lambda.
 exports.processCallback = (callback, event, fulfillmentState, message) => {
+    console.log(fulfillmentState),
+    console.log(message);
+
     // Verify the developer passed a valid fulfillmentState.
     if(fulfillmentState !== "Failed" && fulfillmentState !== "Fulfilled") {
         fulfillmentState = "Failed";
@@ -60,20 +63,44 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
         });
     } else {
         callback(null, {
-            version : '1.0',
+            version : "1.0",
             sessionAttributes : {},
             response : {
                 outputSpeech: {
-                    type : 'PlainText',
+                    type : "PlainText",
                     message : message,
                 },
                 card : {
-                    type : 'Simple',
+                    type : "Simple",
                     title : "Ken Bot",
                     content : message,
                 },
                 shouldEndSession : true,
             },
         });
+    }
+};
+
+// Wrapper for making a validation callback to Lambda.
+exports.processValidation = (callback, event, slot_to_elicit, message) => {
+    console.log(slot_to_elicit),
+    console.log(message);
+
+    if(event.version === undefined) {
+        callback(null, {
+            sessionAttributes : event.currentIntent.sessionAttributes,
+            dialogAction : {
+                type : "ElicitSlot",
+                intentName : event.currentIntent.name,
+                slots : event.currentIntent.slots,
+                slotToElicit : slot_to_elicit,
+                message : {
+                    contentType : "PlainText",
+                    content : message
+                },
+            },
+        });
+    } else {
+        // @TODO Alexa Skill
     }
 };
