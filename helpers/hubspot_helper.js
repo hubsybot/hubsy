@@ -5,9 +5,11 @@ const bluebird = require("bluebird");
 
 // Simple wrapper for creating a request in Node.
 exports.createRequest = (path, method, body) => {
+    var url = config.hubspot.base_url + path + "&hapikey=" + config.hubspot.api_key + "&limit=5";
+
     // Setup the options for the request.
     var options = {
-        "url"    : config.hubspot.base_url + path + "&hapikey=" + config.hubspot.api_key,
+        "url"    : url,
         "method" : method
     };
 
@@ -17,15 +19,33 @@ exports.createRequest = (path, method, body) => {
         options.form = body;
     }
 
-    // Use bluebird to create a promise for the request. If there is an error
-    // reject and let the client calling handle the rejection.
-    return new bluebird((resolve, reject) => {
-        request(options, (err, res, body) => {
-            if(err) {
-                reject(err)
-            } else {
-                resolve(JSON.parse(body));
+    function getData() {
+        return new bluebird((resolve, reject) => {
+            var data = [];
+
+            function next(options) {
+                request(options, (err, res, body) => {
+                    if(err) {
+                        reject(err)
+                    } else {
+                        body = JSON.parse(body);
+
+                        data.push(body);
+
+                        if(body.hasMore === true) {
+                            options.url = url + "&offset=" + body.offset;
+
+                            next(options);
+                        } else {
+                            resolve(data);
+                        }
+                    }
+                });
             }
+
+            next(options);
         });
-    });
+    };
+
+    return getData();
 };

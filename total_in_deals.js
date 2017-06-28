@@ -4,8 +4,6 @@
  * Commands (Variations of commands are available. See Lex intent for details.)
  *
  * What is the total value of deals in the {stage}​ stage.
- *
- * @TODO This is a paged call so we will need to work with multiple pages potentially.
  */
 
 // Include the config and helpers.
@@ -35,16 +33,18 @@ exports.handler = (event, context, callback) => {
     }
 
     // Create the request into hubspot using the helper.
-    hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=amount", "GET", null).then((data) => {
+    hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=amount", "GET", null).then((body) => {
         var total_amount = 0;
         var content   = "The total amount is ";
 
         // Loop through each of the deals and if one matches the id of the stage
         // then increase the counter.
-        data.deals.forEach((deal) => {
-            if(deal.properties.dealstage.value === stage_guid) {
-                total_amount += parseFloat(deal.properties.amount.value);
-            }
+        body.forEach((data) => {
+            data.deals.forEach((deal) => {
+                if(deal.properties.dealstage.value === stage_guid) {
+                    total_amount += parseFloat(deal.properties.amount.value);
+                }
+            });
         });
 
         // Build the content to send back to Lex.

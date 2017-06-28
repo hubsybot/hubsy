@@ -5,8 +5,6 @@
  *
  * How many deals are in the `{stage}` stage.
  * How many deals are in the `{stage}` assigned to `{sales}`.
- *
- * @TODO This is a paged call so we will need to work with multiple pages potentially.
  */
 
 // Include the config and helpers.
@@ -60,18 +58,20 @@ exports.handler = (event, context, callback) => {
     }
 
     // Create the request into hubspot using the helper.
-    hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=hubspot_owner_id", "GET", null).then((data) => {
+    hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=hubspot_owner_id", "GET", null).then((body) => {
         var num_deals = 0;
         var content   = "";
 
         // Loop through each of the deals and if one matches the id of the stage
         // then increase the counter.
-        data.deals.forEach((deal) => {
-            if(deal.properties.dealstage.value === stage_guid && sales_name === null) {
-                ++num_deals;
-            } else if(deal.properties.dealstage.value === stage_guid && sales_name !== null && deal.properties.hubspot_owner_id.sourceId === sales_email) {
-                ++num_deals;
-            }
+        body.forEach((data) => {
+            data.deals.forEach((deal) => {
+                if(deal.properties.dealstage.value === stage_guid && sales_name === null) {
+                    ++num_deals;
+                } else if(deal.properties.dealstage.value === stage_guid && sales_name !== null && deal.properties.hubspot_owner_id.sourceId === sales_email) {
+                    ++num_deals;
+                }
+            });
         });
 
         // Build the content to send back to Lex.
