@@ -169,35 +169,37 @@ exports.handler = (event, context, callback) => {
     };
 
     // Create the request into hubspot using the helper.
-    hubspot_helper.createRequest("/engagements/v1/engagements/paged?", "GET", null).then((data) => {
+    hubspot_helper.createRequest("/engagements/v1/engagements/paged?", "GET", null).then((body) => {
         var num_engagements = 0;
         var content   = "";
 
         // Loop through each of the engagements and if one matches the provided criteria then increase the counter.
         // Engagement info -> https://developers.hubspot.com/docs/methods/engagements/engagements-overview
-        data.results.forEach((engagement) => {
-            var timestamp = moment(engagement.engagement.timestamp).startOf('date');
-            // Test to see if engagement's timestamp is within requested range.
-            var timeframe_in_range = false;
-            
-            if(timeframe_obj.range === false) {
-                timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable);
-            // In case there is a range of timeframes (ie. last week)
-            } else {
-                timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable_low, timeframe_obj.comparable_high);
-            }
+        body.forEach((data) => {
+            data.results.forEach((engagement) => {
+                var timestamp = moment(engagement.engagement.timestamp).startOf('date');
+                // Test to see if engagement's timestamp is within requested range.
+                var timeframe_in_range = false;
+                
+                if(timeframe_obj.range === false) {
+                    timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable);
+                // In case there is a range of timeframes (ie. last week)
+                } else {
+                    timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable_low, timeframe_obj.comparable_high);
+                }
 
-            // Test cases
-            console.log("engagement type", engagement.engagement.type === engagement_type,
-                "timeframe in range", timeframe_in_range, "ownerId", engagement.engagement.ownerId === owner_id)
+                // Test cases
+                console.log("engagement type", engagement.engagement.type === engagement_type,
+                    "timeframe in range", timeframe_in_range, "ownerId", engagement.engagement.ownerId === owner_id)
 
-            // Test to see if engagement meets criteria provided by slots.
-            if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name === null) {
-                ++num_engagements;
-            } else if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name !== null 
-                && engagement.engagement.ownerId === owner_id) {
+                // Test to see if engagement meets criteria provided by slots.
+                if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name === null) {
                     ++num_engagements;
-            }
+                } else if(engagement.engagement.type === engagement_type && timeframe_in_range === true && sales_name !== null 
+                    && engagement.engagement.ownerId === owner_id) {
+                        ++num_engagements;
+                }
+            });
         });
 
         // Build the content to send back to Lex.
