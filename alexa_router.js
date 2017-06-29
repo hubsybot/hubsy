@@ -16,7 +16,7 @@ exports.handler = (event, context, callback) => {
         case "TotalInDeals":
             intent = require(__dirname + "/total_in_deals");
             break;
-        case "ContactInfo":
+        case "GetContactInfo":
             intent = require(__dirname + "/contact_info");
             break;
     }

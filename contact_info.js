@@ -21,6 +21,7 @@ const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 exports.handler = (event, context, callback) => {
     var slots        = lambda_helper.parseSlots(event);
 
+    // Get contact information.
     var contact_info = slots.contact_info.value;
     var contact_slot = slots.contacts.value;
 

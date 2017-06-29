@@ -68,9 +68,9 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
             version : "1.0",
             sessionAttributes : {},
             response : {
-                outputSpeech: {
+                outputSpeech : {
                     type : "PlainText",
-                    message : message,
+                    text : message,
                 },
                 card : {
                     type : "Simple",
