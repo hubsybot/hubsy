@@ -9,12 +9,15 @@ exports.handler = (event, context, callback) => {
     switch(event.request.intent.name) {
         case "EngagementsByPeople":
             intent = require(__dirname + "/engagements_by_people");
-            break;        
+            break;
         case "DealsInStage":
             intent = require(__dirname + "/deals_in_stage");
             break;
         case "TotalInDeals":
             intent = require(__dirname + "/total_in_deals");
+            break;
+        case "ContactInfo":
+            intent = require(__dirname + "/contact_info");
             break;
     }
 

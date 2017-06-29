@@ -1,5 +1,5 @@
 # Configuration variables.
-TERRAFORM_VERSION := 0.9.8
+TERRAFORM_VERSION := 0.9.9
 AWS_REGION := us-east-1
 
 # Launch Terraform in a isolated docker container.
