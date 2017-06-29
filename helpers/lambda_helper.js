@@ -34,6 +34,8 @@ exports.parseSlots = (event) => {
         }
     }
 
+    console.log(slots)
+
     return slots;
 };
 

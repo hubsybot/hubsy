@@ -1,10 +1,26 @@
-const config         = require(__dirname + "/config/config.json");
+/**
+ * Intent:
+ *   EngagementsByPeople
+ *
+ * Slot Types:
+ * 	engagement_type : {NOTE, EMAIL, TASK, MEETING, or CALL}
+ *  sales_name :      {null, andrew, andy, john}
+ *  timeframe :       {today, yesterday, this week, last week, this month, last month, this year} | Defaults to today
+ *
+ * Commands:
+ *   How many {engagements} have been made?
+ *   How many {engagements} were made {timeframe}?
+ *   How many {enagagments} did {sales} make {timeframe}?
+ *
+ * Notes:
+ */
+
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 
-// Handler for the Lambda function.
 exports.handler = (event, context, callback) => {
     var slots        = lambda_helper.parseSlots(event);
+
     var contact_info = slots.contact_info.value;
     var contact_slot = slots.contacts.value;
 
@@ -19,7 +35,7 @@ exports.handler = (event, context, callback) => {
 
     // Create the request into hubspot using the helper.
     hubspot_helper.createRequest(`/contacts/v1/search/query?q=${contact_slot}`, "GET", null).then((body) => {
-        var content   = "";
+        var content      = "";
         var contact_list = [];
 
         // Loop through each of the engagements for potentially multiple matches.

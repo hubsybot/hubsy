@@ -8,6 +8,10 @@ TERRAFORM := docker run --rm -it -e AWS_PROFILE=ken_bot -e AWS_REGION=${AWS_REGI
 # Default will be just to do a Terraform plan.
 default: plan
 
+# Lint the JS files.
+eslint:
+	./eslint.sh
+
 # Initialize the Terraform backend.
 init:
 	rm -rf .terraform && \
@@ -26,7 +30,7 @@ build:
 
 # Planning will build the Lambda functions, initialize Terraform backend and then
 # do a Terraform plan.
-plan: build init
+plan: eslint build init
 	${TERRAFORM} plan -var="aws_region=${AWS_REGION}" -out=.terraform/terraform.tfplan
 
 # Run a Terraform apply against the plan that was ran. It will also do a little

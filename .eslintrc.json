@@ -1,0 +1,16 @@
+{
+    "parserOptions" : {
+        "ecmaVersion" : 6
+    },
+    "rules" : {
+        "eqeqeq" : "error",
+        "block-scoped-var" : "error",
+        "curly" : [
+            "error",
+            "all"
+        ],
+        "no-alert" : "error",
+        "no-empty-function" : "error",
+        "no-unused-vars" : "error"
+    }
+}

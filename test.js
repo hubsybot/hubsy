@@ -1,4 +1,3 @@
-const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const similarity     = require("string-similarity");
 

@@ -1,17 +1,20 @@
 /**
- * Intent: TotalInDeals
+ * Intent:
+ *   TotalInDeals
  *
- * Commands (Variations of commands are available. See Lex intent for details.)
+ * Slot Types:
+ * 	stage : {discovery, won, lost}
  *
- * What is the total value of deals in the {stage}​ stage.
+ * Commands:
+ *   What is the total value of deals in the {stage}​ stage.
+ *
+ * Notes:
  */
 
-// Include the config and helpers.
 const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 
-// Handler for the Lambda function.
 exports.handler = (event, context, callback) => {
     var slots = lambda_helper.parseSlots(event);
 
