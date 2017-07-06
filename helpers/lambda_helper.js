@@ -86,11 +86,12 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
 // Wrapper for making a validation callback to Lambda.
 exports.processValidation = (callback, event, slot_to_elicit, message) => {
     console.log(slot_to_elicit),
-    console.log(message);
+    console.log(message)
+    console.log("processValidation", event.sessionAttributes)
 
     if(event.version === undefined) {
         callback(null, {
-            sessionAttributes : event.currentIntent.sessionAttributes,
+            sessionAttributes : event.sessionAttributes,
             dialogAction : {
                 type : "ElicitSlot",
                 intentName : event.currentIntent.name,

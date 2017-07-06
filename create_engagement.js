@@ -1,10 +1,10 @@
 /**
  * Intent:
- *   EngagementsByPeople
+ *   CreateEngagementFor
  *
  * Slot Types:
  * 	engagement_type : {NOTE, EMAIL, TASK, MEETING, or CALL}
- *  sales_name :      {null, andrew, andy, john}
+ *  sales_slot :      {null, andrew, andy, john}
  *  timeframe :       {today, yesterday, this week, last week, this month, last month, this year} | Defaults to today
  *
  * Commands:
@@ -15,6 +15,7 @@
  * Notes:
  */
 
+const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 
@@ -46,103 +47,115 @@ exports.handler = (event, context, callback) => {
     var sessionAttributes = event.sessionAttributes || {};
 
     // For testing
-    // var contact_info = event.contact_info;
-    // var contact_slot = 'jo'
-    // var confirmation = event.confirmation;
+    // var contact_slot    = null;
+    // var engagement_slot = 'note';
+    // var sales_slot      = 'Andrew';
+    // var engagement_valid = false;
+    // var contact_confirmation    = null;
 
-    // Get contact information.
-    var contact_info = slots.contact_info.value;
-    var contact_slot = slots.contacts.value;
-    var confirmation = slots.confirmation.value;
+    // Get Engagement Creation from slots.
+    var contact_slot    = slots.contacts.value;
+    var engagement_slot = slots.engagements.value;
+    var sales_slot      = slots.sales.value;
+    
+    // Validations
+    var engagement_valid = "engagement_valid" in sessionAttributes ? sessionAttributes.engagement_valid : false;
+    var contact_confirmation    = slots.contact_confirmation.value;
 
+    // Required post information.
+    // https://developers.hubspot.com/docs/methods/engagements/create_engagement
+    var engagement_type = null;
+    var owner_id = null;
+    var timestamp = Date.now();
+
+    // Engagement validation.
+    if(engagement_slot === null) {
+        return lambda_helper.processValidation(callback, event, "engagements", 'Lex didnt reconize the engagement mentioned.');
+    } else {
+        // Test to see if engagement provided is valid
+        if(engagement_valid === false) {
+            var possible_engagements = [
+                {
+                    "name" : "EMAIL"
+                },
+                {
+                    "name" : "NOTE"
+                },
+                {
+                    "name" : "TASK"
+                },
+                {
+                    "name" : "MEETING"
+                },
+                {
+                    "name" : "CALL"
+                }
+            ];
+        
+            possible_engagements.forEach((engagement) => {
+                console.log(engagement_slot.toUpperCase().includes(engagement.name))
+                if(engagement_slot.toUpperCase().includes(engagement.name) === true) {
+                    engagement_type = engagement.name;
+                    engagement_valid = true;
+                }
+            });
+
+            if(engagement_valid === false) {
+                var message = `
+                ${engagement_type} sounds like a strange engagement...
+                    Please choose one of the following:
+                    calls
+                    emails
+                    notes
+                    tasks
+                `;
+                return lambda_helper.processValidation(callback, event, "engagements", message);
+            // Engagement type was just found to be valid
+            } else {
+                // Update Session Attributes
+                sessionAttributes.engagement_valid = true      
+                event.sessionAttributes = sessionAttributes
+            };
+        } else {
+            console.log("Engagement has already been validated")
+        };    
+    };
+
+    // Sales validation which ultimately stems from config file.
+    if(sales_slot === null) {
+        // Lex didnt recognize the slot name
+        return lambda_helper.processValidation(callback, event, "sales", "What member of your team should this be assigned to?");
+    } else {
+        // Loop through sales people and check for both first and last name.
+        config.sales_people.forEach((person) => {
+            if(sales_slot.includes(person.first) === true || sales_slot.includes(person.last) === true) {
+                owner_id = parseInt(person.ownerId);
+            }
+        });
+        // If the name got through and it is not found then just process a failed callback.
+        if(owner_id === null) {
+            message = `I am sorry but we could not find the sales person ${sales_slot}`;
+
+            return lambda_helper.processCallback(callback, event, "Failed", message);
+        };
+    };
+
+    // Contact validation
     if(contact_slot === null) {
         // Lex didnt recognize the slot name
-        return lambda_helper.processCallback(callback, event, "Failed", "We did not recognize the results name.");
-    }
+        return lambda_helper.processValidation(callback, event, "contacts", "What contact does this relate to?");
 
-    // Define the properties we want back from hubspot
-    var hubspot_properties = [
-       'associatedcompanyid',
-       'jobtitle',
-       'firstname',
-       'lastname'
-    ]
-    hubspot_properties = '&property=' + hubspot_properties.join('&property=')
-
-    if(confirmation === "yes") {
-        if(event.invocationSource === "DialogCodeHook" && contact_info === null) {
-            // If we do not have the contact_info value we want to request send a followup.
-            return lambda_helper.processValidation(callback, event, "contact_info", "What type of information would you like to get? (summary, email, title, phone)");
-        }
-
+    } else if(contact_confirmation === "yes") {
         // The user selected the last result
         var confirmation_counter = parseInt(event.sessionAttributes.confirmation_count) - 1;
         var contact_list         = JSON.parse(event.sessionAttributes.contact)
         var selected_contact     = contact_list[confirmation_counter]
-        var selected_contact_id  = selected_contact.contact_id 
-
-        // The user has confirmed the contact and the contact_id has been established
-        hubspot_helper.createRequest(`/contacts/v1/contact/vid/${selected_contact_id}/profile?`, "GET", null).then((body) => {
-            var person_data = body[0].properties
-            var company_data = body[0]['associated-company'].properties
-
-            var first_name   = "firstname" in person_data ? person_data.firstname.value : null;
-            var last_name    = "lastname" in person_data ? person_data.lastname.value : null;
-            var full_name    = `${first_name} ${last_name}`;
-            var revenue      = "annualrevenue" in person_data ? person_data.annualrevenue.value : null;
-            var email        = "email" in person_data ? person_data.email.value : null;
-            var phone        = "phone" in person_data ? person_data.phone.value : null;          
-            var city         = "city" in person_data ? person_data.city.value : null;
-            var state        = "state" in person_data ? person_data.state.value : null;
-            var address      = "address" in person_data ? person_data.address.value : null;
-            var job_title    = "jobtitle" in person_data ? person_data.jobtitle.value : null;
-            var company_name = "name" in company_data ? company_data.name.value : null;
-            var company_fb   = "facebook_company_page" in company_data ? company_data.facebook_company_page.value : null;
-
-            if(contact_info.includes("summary")) {
-                content = `Here's what I found on ${full_name}...
-                This indvidual works at ${company_name} (check them out on facebook here -> ${company_fb}
-                Hailing from ${city}, ${state} he/she is worth $${revenue} to us. 
-                I'll just get to the point:
-                Phone: ${phone}
-                Email: ${email}
-                Address: ${address}
-                `;
-
-            } else if(contact_info.includes("email")) {
-                if(person_data.email.value === null) {
-                    return lambda_helper.processValidation(callback, event, "contact_info", `Oops, email is unavailable for ${full_name} want something else? (title, phone)`)
-                } else {
-                    content = `Email is ${email}`;
-                }            
-            } else if(contact_info.includes("title")) {
-                if(person_data.jobtitle.value === null) {
-                    return lambda_helper.processValidation(callback, event, "contact_info", `Oops, title is unavailable for ${full_name} want something else? (email, phone)`)
-                } else {
-                    content = `Job title is ${job_title}`;
-                }                
-            } else if(contact_info.includes("name")) {
-                if(full_name === null) {
-                    return lambda_helper.processValidation(callback, event, "contact_info", `Oops, full name is unavailable for this indvidual, want something else? (email, phone, title)`)
-                } else {
-                    content = `Name is ${full_name}`;
-                }            
-            } else if(contact_info.includes("phone")) {
-                if(data.phone.value === null) {
-                    return lambda_helper.processValidation(callback, event, "contact_info", `Oops, phone is unavailable for ${full_name}, want something else? (email, title)`)
-                } else {
-                    content = `Phone is ${phone}`;
-                }                
-            }
-            console.log(content)
-            return lambda_helper.processCallback(callback, event, "Fulfilled", content);
-        }).catch((err) => {
-            console.log(err.message)
-            return lambda_helper.processCallback(callback, event, "Failed", err.message);
-        });
+        var selected_contact_id  = selected_contact.contact_id    
+        console.log(`${selected_contact_id} Contact has been confirmed!`)
+        return lambda_helper.processCallback(callback, event, "Fulfilled", `Ok great, thats all the information I care about right now.`)
 
     // User denied the last contact we showed them.     
-    } else if(confirmation === "no") {
+    } else if(contact_confirmation === "no") {
         var contact_list         = JSON.parse(event.sessionAttributes.contact)     
         var confirmation_counter = parseInt(event.sessionAttributes.confirmation_count);
         
@@ -150,7 +163,7 @@ exports.handler = (event, context, callback) => {
         if(contact_list.length - 1 < confirmation_counter) {
             console.log(`No more possible matches for ${contact_slot}`)
             return lambda_helper.processCallback(callback, event, "Fulfilled", `No more possible matches for ${contact_slot}`)
-        }
+        };
 
         console.log("contact_list", contact_list)
         var full_name = `${contact_list[confirmation_counter].first_name} ${contact_list[confirmation_counter].last_name}`
@@ -159,16 +172,26 @@ exports.handler = (event, context, callback) => {
         // Cycle to next available contact.
         ++confirmation_counter
         
-        // Reset sessionAttributes to return to lex.
+        // Reset sessionAttributes to send to lex.
         sessionAttributes.confirmation_count = confirmation_counter
         sessionAttributes.contact = JSON.stringify(contact_list)
         event.sessionAttributes = sessionAttributes
 
         console.log(`Is ${full_name}, ${job_title}, who you are looking for? (yes, no)`)
-        return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}, who you are looking for? (yes, no)`)
+        return lambda_helper.processValidation(callback, event, "contact_confirmation", `Is ${full_name}, ${job_title}, who you are looking for? (yes, no)`)
 
     // We haven't supplied the user with a contact to confirm yet.
-    } else if(confirmation === null) {    
+    } else if(contact_confirmation === null) {
+        // Define the properties we want back from hubspot
+        // which ultimately improves the speed of the API call.
+        var hubspot_properties = [
+           'associatedcompanyid',
+           'jobtitle',
+           'firstname',
+           'lastname'
+        ]
+        hubspot_properties = '&property=' + hubspot_properties.join('&property=')
+
         // Create the request into hubspot using the helper.
         // Contacts search -> https://developers.hubspot.com/docs/methods/contacts/search_contacts
         hubspot_helper.createRequest(`/contacts/v1/search/query?q=${contact_slot}${hubspot_properties}`, "GET", null).then((body) => {
@@ -210,13 +233,11 @@ exports.handler = (event, context, callback) => {
 
             console.log("ending check", event.sessionAttributes)
             console.log("confirmation_count", confirmation_counter)
-            return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}... who you are looking for? (yes, no)`)
+            return lambda_helper.processValidation(callback, event, "contact_confirmation", `Is ${full_name}, ${job_title}... who you are looking for? (yes, no)`)
 
         }).catch((err) => {
             console.log(err.message)
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });
     }
-
-
 };

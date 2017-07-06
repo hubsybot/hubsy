@@ -25,7 +25,6 @@ const moment         = require("moment");
 
 exports.handler = (event, context, callback) => {
     var slots   = lambda_helper.parseSlots(event);
-
     var message = "";
 
     // Engagement information.
