@@ -47,6 +47,10 @@ resource "aws_cloudwatch_log_group" "engagements_by_people" {
     retention_in_days = "${var.cloudwatch_log_retention}"
 }
 
+resource "aws_cloudwatch_log_group" "compare_sales_people" {
+    name = "/aws/lambda/compare_sales_people"
+    retention_in_days = "${var.cloudwatch_log_retention}"
+}
 
 resource "aws_cloudwatch_log_group" "total_in_deals" {
     name = "/aws/lambda/total_in_deals"
@@ -144,6 +148,17 @@ resource "aws_lambda_function" "engagements_by_people" {
     timeout = "${var.lambda_timeout["low"]}"
 }
 
+resource "aws_lambda_function" "compare_sales_people" {
+    filename = "./ken_bot.zip"
+    function_name = "compare_sales_people"
+    role = "${aws_iam_role.ken_bot.arn}"
+    handler = "compare_sales_people.handler"
+    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    runtime = "${var.lambda_runtime}"
+    memory_size = "${var.lambda_memory["low"]}"
+    timeout = "${var.lambda_timeout["low"]}"
+}
+
 resource "aws_lambda_function" "alexa_router" {
     filename = "./ken_bot.zip"
     function_name = "alexa_router"
@@ -187,6 +202,16 @@ resource "aws_lambda_permission" "engagements_by_people_lex" {
     function_name = "${aws_lambda_function.engagements_by_people.function_name}"
     principal = "lex.amazonaws.com"
     source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.engagements_by_people.function_name}:*"
+}
+
+# Compare Sales People
+
+resource "aws_lambda_permission" "compare_sales_people_lex" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.compare_sales_people.function_name}"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.compare_sales_people.function_name}"
+    principal = "lex.amazonaws.com"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.compare_sales_people.function_name}:*"
 }
 
 # Deals In Stage

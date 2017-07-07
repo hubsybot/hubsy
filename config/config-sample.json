@@ -11,6 +11,11 @@
             "ownerId" : ""
         }
     ],
+    "engagements" : [
+        {
+            "name" : ""
+        }
+    ],
     "stages" : [
         {
             "name" : "",

@@ -34,15 +34,15 @@ exports.parseSlots = (event) => {
         }
     }
 
-    console.log(slots)
+    console.log("Parsed Slots: " + slots)
 
     return slots;
 };
 
 // Wrapper for making a closing callback to Lambda.
 exports.processCallback = (callback, event, fulfillmentState, message) => {
-    console.log(fulfillmentState),
-    console.log(message);
+    console.log("Fulfillment State: " + fulfillmentState),
+    console.log("Message: " + message);
 
     // Verify the developer passed a valid fulfillmentState.
     if(fulfillmentState !== "Failed" && fulfillmentState !== "Fulfilled") {
@@ -85,9 +85,8 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
 
 // Wrapper for making a validation callback to Lambda.
 exports.processValidation = (callback, event, slot_to_elicit, message) => {
-    console.log(slot_to_elicit),
-    console.log(message)
-    console.log("processValidation", event.sessionAttributes)
+    console.log("Slots To Elicit: " + slot_to_elicit),
+    console.log("Message: " + message)
 
     if(event.version === undefined) {
         callback(null, {

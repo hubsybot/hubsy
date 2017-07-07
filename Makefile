@@ -25,8 +25,8 @@ init:
 
 # Build the Lambda functions and zip them up to have Terraform ship to Lambda.
 build:
-	npm install && \
-	zip ken_bot.zip -r *.js node_modules config helpers
+	npm install --silent && \
+	zip ken_bot.zip -r *.js node_modules config helpers > /dev/null
 
 # Planning will build the Lambda functions, initialize Terraform backend and then
 # do a Terraform plan.
