@@ -2,7 +2,7 @@ const moment = require('moment');
 
 // Functions will return true/false if time is within parameters.
 const time_greater = (timestamp, comp_timestamp) => {return timestamp.isAfter(comp_timestamp)};
-const time_less    = (timestamp, comp_timestamp) => {return timestamp.isBefore(comp_timestamp)};
+//const time_less    = (timestamp, comp_timestamp) => {return timestamp.isBefore(comp_timestamp)};
 const time_equal   = (timestamp, comp_timestamp) => {return timestamp.isSame(comp_timestamp)};
 const time_between = (timestamp, low_timestamp, high_timestamp) => {return timestamp.isBetween(low_timestamp, high_timestamp, null, "[]")};
 

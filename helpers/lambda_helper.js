@@ -103,6 +103,14 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
             },
         });
     } else {
-        // @TODO Alexa Skill
+        callback(null, {
+            type : "Dialog.ElicitSlot",
+            slotToElicit : slot_to_elicit,
+            updatedIntent : {
+                name : event.request.intent.name,
+                confirmationStatus : "NONE",
+                slots : event.request.intent.slots
+            }
+        });
     }
 };
