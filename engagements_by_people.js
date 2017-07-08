@@ -2,19 +2,19 @@
  * Intent:
  *   EngagementsByPeople
  *
+ * Description:
+ *   Engagements are used to store data from CRM actions, including notes, tasks,
+ *   meetings, and calls specfied under engagement type.
+ *
  * Slot Types:
- * 	engagement_type : {NOTE, EMAIL, TASK, MEETING, or CALL}
- *  sales_name :      {null, andrew, andy, john}
- *  timeframe :       {today, yesterday, this week, last week, this month, last month, this year} | Defaults to today
+ * 	 engagement_type : {NOTE, EMAIL, TASK, MEETING, or CALL}
+ *   sales_name      : {null, andrew, andy, john}
+ *   timeframe       : {today, yesterday, this week, last week, this month, last month, this year} | Defaults to today
  *
  * Commands:
  *   How many {engagements} have been made?
  *   How many {engagements} were made {timeframe}?
  *   How many {enagagments} did {sales} make {timeframe}?
- *
- * Notes:
- *   Engagements are used to store data from CRM actions, including notes, tasks,
- *   meetings, and calls specfied under engagement.type
  */
 
 const config         = require(__dirname + "/config/config.json");

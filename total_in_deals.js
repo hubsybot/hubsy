@@ -2,15 +2,16 @@
  * Intent:
  *   TotalInDeals
  *
+ * Description:
+ *   Getting the total value of deals in a specific stage.
+ *
  * Slot Types:
- * 	stage : {discovery, won, lost}
+ * 	 stage : {null, discovery, quote, negotiate, lost, won}
  *
  * Commands:
  *   What is the total value of deals in the {stage}​ stage.
- *
- * Notes:
+ *   What is the total value of deals.
  */
-
 const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
@@ -18,27 +19,32 @@ const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 exports.handler = (event, context, callback) => {
     var slots = lambda_helper.parseSlots(event);
 
-    // Stage information.
+    /*
+     * Stage
+     */
     var stage_guid = null;
     var stage_name = slots.stage.value;
 
-    // It's not exactly clear what stage name could come back in the slot
-    // so we can just see if it includes one of our predefined ones.
+    // First check if there is a value in the slot.
+    if(slots.stage.value === null) {
+        return lambda_helper.processValidation(callback, event, "stage", "What type of stage would you like to query? I have discovery, quote, negotiate, lost, or won available.");
+    }
+
+    // Second loop through to see if it is a valid slot.
     config.stages.forEach((stage) => {
         if(stage_name.includes(stage.name) === true) {
             stage_guid = stage.guid;
         }
     });
 
-    // If it is not found then process a failed callback.
+    // Third if the slot was not found ask for it again.
     if(stage_guid === null) {
-        return lambda_helper.processCallback(callback, event, "Failed", "I am sorry but we could not find the stage " + stage_name);
+        return lambda_helper.processValidation(callback, event, "stage", "I did not understand that stage. I have discovery, quote, negotiate, lost, or won available.");
     }
 
-    // Create the request into hubspot using the helper.
     hubspot_helper.createRequest("/deals/v1/deal/paged?properties=dealstage&properties=amount", "GET", null).then((body) => {
         var total_amount = 0;
-        var content   = "The total amount is ";
+        var content      = null;
 
         // Loop through each of the deals and if one matches the id of the stage
         // then increase the counter.
@@ -51,7 +57,7 @@ exports.handler = (event, context, callback) => {
         });
 
         // Build the content to send back to Lex.
-        content = content + total_amount + " dollars.";
+        content = `The total amount is ${total_amount} dollars.`;
 
         return lambda_helper.processCallback(callback, event, "Fulfilled", content);
     }).catch((err) => {

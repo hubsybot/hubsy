@@ -6,43 +6,43 @@ exports.parseSlots = (event) => {
 
     // Parse Amazon Skill slots.
     if(event.request !== undefined) {
-        for(var key in event.request.intent.slots) {
+        for(var skillKey in event.request.intent.slots) {
             // Keep types the same.
-            if(event.request.intent.slots[key].value === undefined) {
-                event.request.intent.slots[key].value = null;
+            if(event.request.intent.slots[skillKey].value === undefined) {
+                event.request.intent.slots[skillKey].value = null;
             }
 
-            slots[key] = {
-                name : key,
-                value : event.request.intent.slots[key].value
+            slots[skillKey] = {
+                name : skillKey,
+                value : event.request.intent.slots[skillKey].value
             };
         };
     }
 
     // Parse Lex slots.
     if(event.currentIntent !== undefined) {
-        for(var key in event.currentIntent.slots) {
+        for(var lexKey in event.currentIntent.slots) {
             // Keep types the same.
-            if(event.currentIntent.slots[key] === undefined) {
-                event.currentIntent.slots[key] = null;
+            if(event.currentIntent.slots[lexKey] === undefined) {
+                event.currentIntent.slots[lexKey] = null;
             }
 
-            slots[key] = {
-                name : key,
-                value : event.currentIntent.slots[key]
+            slots[lexKey] = {
+                name : lexKey,
+                value : event.currentIntent.slots[lexKey]
             };
         }
     }
 
-    console.log("Parsed Slots: " + slots)
+    console.log(`Parsed Slots: ${slots}`);
 
     return slots;
 };
 
 // Wrapper for making a closing callback to Lambda.
 exports.processCallback = (callback, event, fulfillmentState, message) => {
-    console.log("Fulfillment State: " + fulfillmentState),
-    console.log("Message: " + message);
+    console.log(`Fulfillment State: ${fulfillmentState}`);
+    console.log(`Message: ${message}`);
 
     // Verify the developer passed a valid fulfillmentState.
     if(fulfillmentState !== "Failed" && fulfillmentState !== "Fulfilled") {
@@ -85,8 +85,8 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
 
 // Wrapper for making a validation callback to Lambda.
 exports.processValidation = (callback, event, slot_to_elicit, message) => {
-    console.log("Slots To Elicit: " + slot_to_elicit),
-    console.log("Message: " + message)
+    console.log(`Slots To Elicit: ${slot_to_elicit}`);
+    console.log(`Message: ${message}`);
 
     if(event.version === undefined) {
         callback(null, {

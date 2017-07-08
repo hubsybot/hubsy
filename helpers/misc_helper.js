@@ -1,4 +1,4 @@
-// Prep engagement slot for comparison with Hubspot API output.
+// Prep engagement slot for comparison with HubSpot API output.
 exports.format_engagement = (engagement_raw) => {
     // If engagement slot provided is plural, make singular.
     if(engagement_raw[engagement_raw.length -1] === "s") {

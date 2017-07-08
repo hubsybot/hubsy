@@ -10,3 +10,10 @@ for filename in *.js; do
 
     eslint $filename
 done
+
+# Loop through helpers
+for filename in helpers/*.js; do
+    echo "helpers/$filename"
+
+    eslint $filename
+done

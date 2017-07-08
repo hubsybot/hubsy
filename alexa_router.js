@@ -1,23 +1,30 @@
+/*
+ * Description:
+ *   The Alexa router will take a look at the intent to figure out what it needs
+ *   to to do with it. To keep things common wether it's Lex or Alexa it will just
+ *   require the file it needs to and pass along the environment variables.
+ *
+ */ 
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 
-// The Alexa router will take a look at the intent to figure out what it needs to
-// to do with it. To keep things common wether it's Lex or Alexa it will just require
-// the file it needs to and pass along the environment variables.
 exports.handler = (event, context, callback) => {
     var intent = null;
 
     switch(event.request.intent.name) {
-        case "EngagementsByPeople":
-            intent = require(__dirname + "/engagements_by_people");
+        case "CompareSalesPeople":
+            intent = require(__dirname + "/compare_sales_people");
+            break;
+        case "GetContactInfo":
+            intent = require(__dirname + "/contact_info");
             break;
         case "DealsInStage":
             intent = require(__dirname + "/deals_in_stage");
             break;
+        case "EngagementsByPeople":
+            intent = require(__dirname + "/engagements_by_people");
+            break;
         case "TotalInDeals":
             intent = require(__dirname + "/total_in_deals");
-            break;
-        case "GetContactInfo":
-            intent = require(__dirname + "/contact_info");
             break;
     }
 

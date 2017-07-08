@@ -1,3 +1,24 @@
+/**
+ * Intent:
+ *   CompareSalesPeople
+ *
+ * Description:
+ *   Comparing sales people will take a specific engagement type, 2 sales people,
+ *   and a timeframe. Look up the amount of times that engagement happened and
+ *   figure out who performed the most.
+ *
+ * Slot Types:
+ * 	 engagement_type : {null, note, email, task, meeting, call}
+ *   salesOne        : {null, andrew, andy, john}
+ *   salesTwo        : {null, andrew, andy, john}
+ *   timeframe       : {today, yesterday, this week, last week, this month, last month, this year}
+ *
+ * Commands:
+ *   I need to compare sales people.
+ *   Help me compare sales people.
+ *   Compare sales people.
+ *   Compare {engagements}​ with {salesOne}​ and {salesTwo}​ for {timeframe}​.
+ */
 const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");

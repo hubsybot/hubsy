@@ -1,4 +1,3 @@
-// Includes for the hubspot helper.
 const config   = require(__dirname + "/../config/config.json");
 const request  = require("request");
 const bluebird = require("bluebird");
@@ -21,6 +20,7 @@ exports.createRequest = (path, method, body) => {
         options.form = body;
     }
 
+    // Page through the HubSpot API until we have received all thats available.
     function getData() {
         return new bluebird((resolve, reject) => {
             var data = [];
