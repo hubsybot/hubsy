@@ -88,7 +88,7 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
     console.log(`Slots To Elicit: ${slot_to_elicit}`);
     console.log(`Message: ${message}`);
 
-    if(event.version === undefined) {
+    if(event.session.application === undefined) {
         callback(null, {
             sessionAttributes : event.sessionAttributes,
             dialogAction : {
