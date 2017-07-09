@@ -82,7 +82,6 @@ exports.handler = (event, context, callback) => {
                 Email: ${email}
                 Address: ${address}
                 `;
-
             } else if(contact_info.includes("email")) {
                 if(person_data.email.value === null) {
                     return lambda_helper.processValidation(callback, event, "contact_info", `Oops, email is unavailable for ${full_name} want something else? (title, phone)`);
@@ -113,7 +112,6 @@ exports.handler = (event, context, callback) => {
         }).catch((err) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });
-
     // User denied the last contact we showed them.
     } else if(confirmation === "no") {
         contact_list         = JSON.parse(event.sessionAttributes.contact);
@@ -176,7 +174,6 @@ exports.handler = (event, context, callback) => {
             event.sessionAttributes = sessionAttributes;
 
             return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}... who you are looking for? (yes, no)`);
-
         }).catch((err) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });
