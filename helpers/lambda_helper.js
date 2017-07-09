@@ -94,7 +94,7 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
 
 // Wrapper for making a validation callback to Lambda.
 exports.processValidation = (callback, event, slot_to_elicit, message) => {
-    console.log(`Slots To Elicit: ${slot_to_elicit}`);
+    console.log(`Slot To Elicit: ${slot_to_elicit}`);
     console.log(`Message: ${message}`);
     console.log(`Validation Event: ${JSON.stringify(event)}`);
 
