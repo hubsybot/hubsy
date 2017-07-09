@@ -47,6 +47,7 @@ exports.parseSlots = (event) => {
 exports.processCallback = (callback, event, fulfillmentState, message) => {
     console.log(`Fulfillment State: ${fulfillmentState}`);
     console.log(`Message: ${message}`);
+    console.log(`Callback Event: ${event}`);
 
     // Verify the developer passed a valid fulfillmentState.
     if(fulfillmentState !== "Failed" && fulfillmentState !== "Fulfilled") {
@@ -95,6 +96,7 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
 exports.processValidation = (callback, event, slot_to_elicit, message) => {
     console.log(`Slots To Elicit: ${slot_to_elicit}`);
     console.log(`Message: ${message}`);
+    console.log(`Validation Event: ${event}`);
 
     if(event.session === undefined) {
         console.log("Responding To Lex");
