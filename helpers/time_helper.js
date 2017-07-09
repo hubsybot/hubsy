@@ -1,10 +1,10 @@
 const moment = require('moment');
 
 // Functions will return true/false if time is within parameters.
-const time_greater = (timestamp, comp_timestamp) => {return timestamp.isAfter(comp_timestamp)};
-//const time_less    = (timestamp, comp_timestamp) => {return timestamp.isBefore(comp_timestamp)};
-const time_equal   = (timestamp, comp_timestamp) => {return timestamp.isSame(comp_timestamp)};
-const time_between = (timestamp, low_timestamp, high_timestamp) => {return timestamp.isBetween(low_timestamp, high_timestamp, null, "[]")};
+const time_greater = (timestamp, comp_timestamp) => { return timestamp.isAfter(comp_timestamp); };
+//const time_less    = (timestamp, comp_timestamp) => { return timestamp.isBefore(comp_timestamp); };
+const time_equal   = (timestamp, comp_timestamp) => { return timestamp.isSame(comp_timestamp); };
+const time_between = (timestamp, low_timestamp, high_timestamp) => { return timestamp.isBetween(low_timestamp, high_timestamp, null, "[]"); };
 
 // Function to determine if slot time provided is valid
 // It's not exactly clear what timeframe could come back in the slot
@@ -20,7 +20,7 @@ exports.timeframe_check = slot_timeframe => {
             "operator" : time_equal,
             "comparable" : moment(slot_timeframe).startOf("date"),
             "range" : false
-        }
+        };
 
         // We arent accounting for exact dates just yet so we will skip for now.
         return timeframe_obj;

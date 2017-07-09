@@ -133,7 +133,7 @@ exports.handler = (event, context, callback) => {
         });
 
         var message = null;
-        var diff = 0;
+        var diff    = 0;
 
         engagement_type = engagement_type.toLowerCase();
 

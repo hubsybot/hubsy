@@ -11,6 +11,7 @@
         ],
         "no-alert" : "error",
         "no-empty-function" : "error",
-        "no-unused-vars" : "error"
+        "no-unused-vars" : "error",
+        "semi" : "error"
     }
 }

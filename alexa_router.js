@@ -3,8 +3,7 @@
  *   The Alexa router will take a look at the intent to figure out what it needs
  *   to to do with it. To keep things common wether it's Lex or Alexa it will just
  *   require the file it needs to and pass along the environment variables.
- *
- */ 
+ */
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 
 exports.handler = (event, context, callback) => {

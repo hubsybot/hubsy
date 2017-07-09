@@ -23,7 +23,7 @@ exports.createRequest = (path, method, payload) => {
 
     if(method === 'POST') {
         return new bluebird((resolve, reject) => {
-            request(options, (err, res, body) => {
+            request(options, (err, res) => {
                 if(err || res.statusCode !== 200) {
                     reject(err);
                 } else {
@@ -41,7 +41,7 @@ exports.createRequest = (path, method, payload) => {
                 function next(options) {
                     request(options, (err, res, body) => {
                         if(err) {
-                            reject(err)
+                            reject(err);
                         } else {
                             body = JSON.parse(body);
 
