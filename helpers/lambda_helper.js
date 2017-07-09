@@ -88,7 +88,7 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
     console.log(`Slots To Elicit: ${slot_to_elicit}`);
     console.log(`Message: ${message}`);
 
-    if(event.session.application === undefined) {
+    // if(event.session.application === undefined) {
         callback(null, {
             sessionAttributes : event.sessionAttributes,
             dialogAction : {
@@ -102,15 +102,15 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
                 },
             },
         });
-    } else {
-        callback(null, {
-            type : "Dialog.ElicitSlot",
-            slotToElicit : slot_to_elicit,
-            updatedIntent : {
-                name : event.request.intent.name,
-                confirmationStatus : "NONE",
-                slots : event.request.intent.slots
-            }
-        });
-    }
+    // } else {
+        // callback(null, {
+        //     type : "Dialog.ElicitSlot",
+        //     slotToElicit : slot_to_elicit,
+        //     updatedIntent : {
+        //         name : event.request.intent.name,
+        //         confirmationStatus : "NONE",
+        //         slots : event.request.intent.slots
+        //     }
+        // });
+    // }
 };

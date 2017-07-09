@@ -18,27 +18,7 @@
 const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
-
-// var event = {
-//     'confirmation' : 'yes',
-//     'contact_info' : 'summary',
-//     'sessionAttributes' : {
-//         'confirmation_count' : 1,
-//     'contact' : [
-//          { 'contact_id': 301,
-//            'assoc_comp_id': '484024107',
-//            'first_name': 'Joe',
-//            'last_name': 'Blow',
-//            'job_title': 'That Guy',
-//            'full_name': 'Joe Blow' },
-//          { 'contact_id': 101,
-//            'assoc_comp_id': '488824200',
-//            'first_name': 'John',
-//            'last_name': 'Doe',
-//            'job_title': 'Anonymous Creator',
-//            'full_name': 'John Doe' } ]
-//     } 
-// }
+const misc_helper    = require(__dirname + "/helpers/misc_helper");
 
 exports.handler = (event, context, callback) => {
     console.log(event);
@@ -46,101 +26,79 @@ exports.handler = (event, context, callback) => {
     var slots        = lambda_helper.parseSlots(event);
     var sessionAttributes = event.sessionAttributes || {};
 
-    // For testing
-    // var contact_slot    = null;
-    // var engagement_slot = 'note';
-    // var sales_slot      = 'Andrew';
-    // var engagement_valid = false;
-    // var contact_confirmation    = null;
+    var owner_id = null;
 
-    // Get Engagement Creation from slots.
-    var contact_slot    = slots.contacts.value;
-    var engagement_slot = slots.engagements.value;
-    var sales_slot      = slots.sales.value;
-    
-    // Validations
-    var engagement_valid = "engagement_valid" in sessionAttributes ? sessionAttributes.engagement_valid : false;
-    var contact_confirmation    = slots.contact_confirmation.value;
+
+
+    var engagement_data = {
+        "engagement": {
+            "active": true,
+            "ownerId": null,
+            "type": null,
+            "timestamp": Date.now()
+        },
+        "associations": {
+            "contactIds": [selected_contact_id],
+            "companyIds": [ ],
+            "dealIds": [ ],
+            "ownerIds": [ ]
+        },
+        "attachments": [],
+        "metadata": {
+            "body": null
+        }
+    }
 
     // Required post information.
     // https://developers.hubspot.com/docs/methods/engagements/create_engagement
-    var engagement_type = null;
-    var owner_id = null;
-    var timestamp = Date.now();
 
-    // Engagement validation.
-    if(engagement_slot === null) {
-        return lambda_helper.processValidation(callback, event, "engagements", 'Lex didnt reconize the engagement mentioned.');
-    } else {
-        // Test to see if engagement provided is valid
-        if(engagement_valid === false) {
-            var possible_engagements = [
-                {
-                    "name" : "EMAIL"
-                },
-                {
-                    "name" : "NOTE"
-                },
-                {
-                    "name" : "TASK"
-                },
-                {
-                    "name" : "MEETING"
-                },
-                {
-                    "name" : "CALL"
-                }
-            ];
-        
-            possible_engagements.forEach((engagement) => {
-                console.log(engagement_slot.toUpperCase().includes(engagement.name))
-                if(engagement_slot.toUpperCase().includes(engagement.name) === true) {
-                    engagement_type = engagement.name;
-                    engagement_valid = true;
-                }
-            });
+    /*
+     * Engagements
+     */
+    var engagement_type = false;
 
-            if(engagement_valid === false) {
-                var message = `
-                ${engagement_type} sounds like a strange engagement...
-                    Please choose one of the following:
-                    calls
-                    emails
-                    notes
-                    tasks
-                `;
-                return lambda_helper.processValidation(callback, event, "engagements", message);
-            // Engagement type was just found to be valid
-            } else {
-                // Update Session Attributes
-                sessionAttributes.engagement_valid = true      
-                event.sessionAttributes = sessionAttributes
-            };
-        } else {
-            console.log("Engagement has already been validated")
-        };    
-    };
+    if(slots.engagements.value === null) {
+        return lambda_helper.processValidation(callback, event, "engagements", "What type of engagements would you like to get? I have email, note, task, meeting, or call available.");
+    }
 
-    // Sales validation which ultimately stems from config file.
-    if(sales_slot === null) {
-        // Lex didnt recognize the slot name
-        return lambda_helper.processValidation(callback, event, "sales", "What member of your team should this be assigned to?");
-    } else {
-        // Loop through sales people and check for both first and last name.
-        config.sales_people.forEach((person) => {
-            if(sales_slot.includes(person.first) === true || sales_slot.includes(person.last) === true) {
-                owner_id = parseInt(person.ownerId);
-            }
-        });
-        // If the name got through and it is not found then just process a failed callback.
-        if(owner_id === null) {
-            message = `I am sorry but we could not find the sales person ${sales_slot}`;
+    config.engagements.forEach((engagement) => {
+        slots.engagements.value = misc_helper.format_engagement(slots.engagements.value);
 
-            return lambda_helper.processCallback(callback, event, "Failed", message);
-        };
-    };
+        if(slots.engagements.value.includes(engagement.name) === true) {
+            engagement_type = true;
+        }
+    });
 
-    // Contact validation
+    if(engagement_type === false) {
+        return lambda_helper.processValidation(callback, event, "engagements", "I did not understand that engagement. I have email, note, task, meeting, or call available.");
+    }
+
+    engagement_type = slots.engagements.value;
+
+    /*
+     * Sales Person
+     */
+    var sales_person = false;
+
+    if(slots.sales.value === null) {
+        return lambda_helper.processValidation(callback, event, "sales", "What team member does this relate to?");
+    }
+
+    config.sales_people.forEach((person) => {
+        if(slots.sales.value.includes(person.first) === true || slots.sales.value.includes(person.last) === true) {
+            sales_person = parseInt(person.ownerId);
+        }
+    });
+
+    if(sales_person === false) {
+        return lambda_helper.processValidation(callback, event, "sales", "I did not find that team member. Who is the first sales person you want to compare?");
+    }
+
+    /*
+     * Contact
+     */
+    var contact_slot            = slots.contacts.value;
+    var contact_confirmation    = slots.contact_confirmation.value;
     if(contact_slot === null) {
         // Lex didnt recognize the slot name
         return lambda_helper.processValidation(callback, event, "contacts", "What contact does this relate to?");
@@ -150,9 +108,15 @@ exports.handler = (event, context, callback) => {
         var confirmation_counter = parseInt(event.sessionAttributes.confirmation_count) - 1;
         var contact_list         = JSON.parse(event.sessionAttributes.contact)
         var selected_contact     = contact_list[confirmation_counter]
-        var selected_contact_id  = selected_contact.contact_id    
+        var selected_contact_id  = selected_contact.contact_id
+
+        if (sessionAttributes.engagement_step > 0) {
+            console.log(sessionAttributes.engagement_step, "greater than 0")
+        } else {
+            sessionAttributes.engagement_step = 0
+            event.sessionAttributes = sessionAttributes
+        }
         console.log(`${selected_contact_id} Contact has been confirmed!`)
-        return lambda_helper.processCallback(callback, event, "Fulfilled", `Ok great, thats all the information I care about right now.`)
 
     // User denied the last contact we showed them.     
     } else if(contact_confirmation === "no") {
@@ -212,8 +176,6 @@ exports.handler = (event, context, callback) => {
                 });
             });
 
-            console.log(contact_list)
-
             if(contact_list.length === 0) {
                 // Hubspot Search returned 0 results.
                 return lambda_helper.processCallback(callback, event, "Failed", `${contact_slot} doesn't appear to be a contact within hubspot.`);
@@ -240,4 +202,123 @@ exports.handler = (event, context, callback) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });
     }
+
+    /*
+     * Engagement Meta Data
+     */
+    
+    // Build Object to post.
+    engagement_data.engagement.ownerId = sales_person
+    engagement_data.engagement.type = engagement_type
+    engagement_data.associations.contactIds = [selected_contact_id]
+
+    if(contact_confirmation === 'yes' && (slots.meta_confirmation.value === null || slots.meta_confirmation.value !== 'yes' || slots.meta_confirmation.value !== 'no')) {
+        console.log('confirmed null meta')
+        if(slots.engagements.value === 'CALL') {            
+            // Call step 1
+            if(parseInt(sessionAttributes.engagement_step) === 0) {
+                console.log('Meta Event', event)
+                sessionAttributes.engagement_step = 1
+                event.sessionAttributes = sessionAttributes
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What was the outcome of this call?`);
+            // Call step 2
+            } else if (parseInt(sessionAttributes.engagement_step) === 1) {
+                console.log(event.inputTranscript)
+                engagement_data.metadata.status = event.inputTranscript 
+                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
+                sessionAttributes.engagement_step = 2
+                event.sessionAttributes = sessionAttributes                
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", `Great any notes on this call?`);
+            // Call step 3
+            } else if (parseInt(sessionAttributes.engagement_step) === 2) {
+                //Add meta data to engagement object.
+                engagement_data = JSON.parse(sessionAttributes.engagement_data)
+                engagement_data.metadata.body = event.inputTranscript
+                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
+                event.sessionAttributes = sessionAttributes 
+                console.log('Meta Event', event)
+                console.log('engagement_data', engagement_data)
+
+                //Make Hubspot Post
+                //
+                hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
+                    console.log(body)
+                    return lambda_helper.processValidation(callback, event, "meta_confirmation", 
+                        `Are you ready for me to log a call that took place between you and ${selected_contact_id} with
+                        a status of ${engagement_data.metadata.status} and the following notes: ${engagement_data.metadata.body} (yes,) 
+                    `);
+                }).catch((err) => {
+                    console.log(err.message)
+                    return lambda_helper.processCallback(callback, event, "Failed", err.message);
+                });                
+            }            
+        } else if(slots.engagements.value === 'EMAIL') {
+            // Email step 1
+            if(parseInt(sessionAttributes.engagement_step) === 0) {
+                console.log('Meta Event', event)
+                sessionAttributes.engagement_step = 1
+                event.sessionAttributes = sessionAttributes
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", `Copy and Paste the email to me`);
+            // Email step 2
+            } else if (parseInt(sessionAttributes.engagement_step) === 1) {
+                //Add meta data to engagement object. 
+                engagement_data.metadata.body = event.inputTranscript 
+                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
+                event.sessionAttributes = sessionAttributes                
+                console.log('Meta Event', event)
+                console.log('engagement_data', engagement_data)
+
+                //Make Hubspot Post
+                //
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", 
+                    `Are you ready for me to log a email that took place between you and ${selected_contact_id} with
+                    a status of ${engagement_data.metadata.status} and the following notes: ${engagement_data.metadata.body} (yes,) 
+                `);
+            // Email step 3
+            }
+        } else if(slots.engagements.value === 'MEETING') {
+            // Meeting step 1
+            if(parseInt(sessionAttributes.engagement_step) === 0) {
+                console.log('Meta Event', event)
+                sessionAttributes.engagement_step = 1
+                event.sessionAttributes = sessionAttributes
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What was the outcome of this call?`);
+            // Meeting step 2
+            } else if (parseInt(sessionAttributes.engagement_step) === 1) {
+                console.log(event.inputTranscript)
+                engagement_data.metadata.status = event.inputTranscript 
+                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
+                sessionAttributes.engagement_step = 2
+                event.sessionAttributes = sessionAttributes                
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", `Great any notes on this call?`);
+            // Meeting step 3
+            } else if (parseInt(sessionAttributes.engagement_step) === 2) {
+                //Add meta data to engagement object.
+                engagement_data = JSON.parse(sessionAttributes.engagement_data)
+                engagement_data.metadata.body = event.inputTranscript
+                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
+                event.sessionAttributes = sessionAttributes 
+                console.log('Meta Event', event)
+                console.log('engagement_data', engagement_data)
+
+                //Make Hubspot Post
+                //
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", 
+                    `Are you ready for me to log a meeting that took place between you and ${selected_contact_id} with
+                    a status of ${engagement_data.metadata.status} and the following notes: ${engagement_data.metadata.body} (yes,) 
+                `);
+            }             
+        }
+        else if(slots.engagements.value === 'TASK') {
+            if(slots.body.value === null) {
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What would`);
+            }            
+        }
+        else if(slots.engagements.value === 'NOTE') {
+            if(slots.body.value === null) {
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What would`);
+            }            
+        }                                
+    }
+
 };

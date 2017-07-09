@@ -20,34 +20,50 @@ exports.createRequest = (path, method, body) => {
         options.form = body;
     }
 
-    // Page through the HubSpot API until we have received all thats available.
-    function getData() {
-        return new bluebird((resolve, reject) => {
-            var data = [];
-
-            function next(options) {
-                request(options, (err, res, body) => {
-                    if(err) {
-                        reject(err)
-                    } else {
-                        body = JSON.parse(body);
-
-                        data.push(body);
-
-                        if(body.hasMore === true) {
-                            options.url = url + "&offset=" + body.offset;
-
-                            next(options);
-                        } else {
-                            resolve(data);
-                        }
-                    }
-                });
-            }
-
-            next(options);
+    if(method === 'POST') {
+        console.log(options)
+        return new bluebird((resolve, reject) => {            
+            request(options, (err, res, body) => {
+                console.log(res.statusCode);
+                console.log(err)
+                console.log(body)
+                if(err) {
+                    reject(err)
+                } else {
+                    resolve(JSON.parse(body));
+                }
+            });
         });
-    };
 
-    return getData();
+    } else if (method === 'GET') {
+        // Page through the HubSpot API until we have received all thats available.
+        function getData() {
+            return new bluebird((resolve, reject) => {
+                var data = [];
+
+                function next(options) {
+                    request(options, (err, res, body) => {
+                        if(err) {
+                            reject(err)
+                        } else {
+                            body = JSON.parse(body);
+
+                            data.push(body);
+
+                            if(body.hasMore === true) {
+                                options.url = url + "&offset=" + body.offset;
+
+                                next(options);
+                            } else {
+                                resolve(data);
+                            }
+                        }
+                    });
+                }
+
+                next(options);
+            });
+        };
+        return getData();
+    };
 };
