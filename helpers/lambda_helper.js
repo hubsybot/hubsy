@@ -6,6 +6,8 @@ exports.parseSlots = (event) => {
 
     // Parse Amazon Skill slots.
     if(event.request !== undefined) {
+        console.log("Parsing Alexa Skills");
+
         for(var skillKey in event.request.intent.slots) {
             // Keep types the same.
             if(event.request.intent.slots[skillKey].value === undefined) {
@@ -21,6 +23,8 @@ exports.parseSlots = (event) => {
 
     // Parse Lex slots.
     if(event.currentIntent !== undefined) {
+        console.log("Parsing Lex Skills");
+
         for(var lexKey in event.currentIntent.slots) {
             // Keep types the same.
             if(event.currentIntent.slots[lexKey] === undefined) {
@@ -53,6 +57,8 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
     // Send back to Alexa Skill if there is an event.version. Otherwise
     // we know there is an event.messageVersion which is for Lex.
     if(event.version === undefined) {
+        console.log("Responding To Lex");
+
         callback(null, {
             "dialogAction" : {
                 "type" : "Close",
@@ -64,6 +70,8 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
             }
         });
     } else {
+        console.log("Responding To Alexa");
+
         callback(null, {
             version : "1.0",
             sessionAttributes : {},
@@ -89,6 +97,8 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
     console.log(`Message: ${message}`);
 
     if(event.session === undefined) {
+        console.log("Responding To Lex");
+
         callback(null, {
             sessionAttributes : event.sessionAttributes,
             dialogAction : {
@@ -103,6 +113,8 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
             },
         });
     } else {
+        console.log("Responding To Alexa");
+
         callback(null, {
             type : "Dialog.ElicitSlot",
             slotToElicit : slot_to_elicit,
