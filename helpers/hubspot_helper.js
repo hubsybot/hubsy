@@ -3,7 +3,7 @@ const request  = require("request");
 const bluebird = require("bluebird");
 
 // Simple wrapper for creating a request in Node.
-exports.createRequest = (path, method, body) => {
+exports.createRequest = (path, method, payload) => {
     var url = config.hubspot.base_url + path + "&hapikey=" + config.hubspot.api_key + "&limit=5";
 
     console.log("HubSpot URL: " + url);
@@ -16,21 +16,18 @@ exports.createRequest = (path, method, body) => {
 
     // If there is going to be details passed into the body include them.
     // Otherwise do not put that in the request.
-    if(body !== null) {
-        options.form = body;
+    if(payload !== null) {
+        options.url  = config.hubspot.base_url + path + "?hapikey=" + config.hubspot.api_key;
+        options.json = payload;
     }
 
     if(method === 'POST') {
-        console.log(options)
-        return new bluebird((resolve, reject) => {            
+        return new bluebird((resolve, reject) => {
             request(options, (err, res, body) => {
-                console.log(res.statusCode);
-                console.log(err)
-                console.log(body)
-                if(err) {
-                    reject(err)
+                if(err || res.statusCode !== 200) {
+                    reject(err);
                 } else {
-                    resolve(JSON.parse(body));
+                    resolve(true);
                 }
             });
         });
