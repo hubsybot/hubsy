@@ -15,7 +15,7 @@ exports.parseSlots = (event) => {
             }
 
             slots[skillKey] = {
-                name : skillKey,
+                name  : skillKey,
                 value : event.request.intent.slots[skillKey].value
             };
         };
@@ -32,7 +32,7 @@ exports.parseSlots = (event) => {
             }
 
             slots[lexKey] = {
-                name : lexKey,
+                name  : lexKey,
                 value : event.currentIntent.slots[lexKey]
             };
         }
@@ -117,14 +117,34 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
     } else {
         console.log("Validating To Alexa");
 
+        event.request.intent.slots[slot_to_elicit].confirmationStatus = "NONE";
+
         callback(null, {
-            type : "Dialog.ElicitSlot",
-            slotToElicit : slot_to_elicit,
-            updatedIntent : {
-                name : event.request.intent.name,
-                confirmationStatus : "NONE",
-                slots : event.request.intent.slots
-            }
+            version : "1.0",
+            sessionAttributes : {},
+            response : {
+                outputSpeech : {
+                    type : "PlainText",
+                    text : message,
+                },
+                card : {
+                    type : "Simple",
+                    title : "Ken Bot",
+                    content : message,
+                },
+                shouldEndSession : false,
+                directives: [
+                    {
+                        type : "Dialog.ElicitSlot",
+                        slotToElicit : slot_to_elicit,
+                        updatedIntent : {
+                            name : event.request.intent.name,
+                            confirmationStatus : "NONE",
+                            slots : event.request.intent.slots
+                        }
+                    }
+                ]
+            },
         });
     }
 };
