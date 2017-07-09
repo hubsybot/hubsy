@@ -8,7 +8,7 @@
  *
  * Slot Types:
  * 	 engagement_type : {null, note, email, task, meeting, call}
- *   sales_name      : {null, andrew, andy, john}
+ *   sales           : {null, andrew, andy, john}
  *   timeframe       : {null, today, yesterday, this week, last week, this month, last month, this year}
  *
  * Commands:
@@ -20,6 +20,7 @@ const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 const time_helper    = require(__dirname + "/helpers/time_helper");
+const misc_helper    = require(__dirname + "/helpers/misc_helper");
 const moment         = require("moment");
 
 exports.handler = (event, context, callback) => {
@@ -52,6 +53,7 @@ exports.handler = (event, context, callback) => {
      * Sales Person
      */
     var sales_person_id = false;
+    var sales_name      = null;
 
     if(slots.sales.value === null) {
         return lambda_helper.processValidation(callback, event, "sales", "Who is the sales person you want to lookup?");
@@ -60,6 +62,7 @@ exports.handler = (event, context, callback) => {
     config.sales_people.forEach((person) => {
         if(slots.sales.value.includes(person.first) === true || slots.sales.value.includes(person.last) === true) {
             sales_person_id = parseInt(person.ownerId);
+            sales_name      = slots.sales.value;
         }
     });
 
@@ -92,11 +95,11 @@ exports.handler = (event, context, callback) => {
                 // Test to see if engagement's timestamp is within requested range.
                 var timeframe_in_range = false;
 
-                if(timeframe_obj.range === false) {
-                    timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable);
+                if(timeframe.range === false) {
+                    timeframe_in_range = timeframe.operator(timestamp, timeframe.comparable);
                 // In case there is a range of timeframes (ie. last week)
                 } else {
-                    timeframe_in_range = timeframe_obj.operator(timestamp, timeframe_obj.comparable_low, timeframe_obj.comparable_high);
+                    timeframe_in_range = timeframe.operator(timestamp, timeframe.comparable_low, timeframe.comparable_high);
                 }
 
                 // Test to see if engagement meets criteria provided by slots.
@@ -111,9 +114,9 @@ exports.handler = (event, context, callback) => {
         var message = "";
 
         if(sales_name !== null) {
-            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${slot_timeframe} by ${sales_name}.`;
+            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${timeframe.name} by ${sales_name}.`;
         } else {
-            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${slot_timeframe}.`;
+            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${timeframe.name}.`;
         }
 
         return lambda_helper.processCallback(callback, event, "Fulfilled", message);
