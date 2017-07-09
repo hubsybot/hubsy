@@ -57,7 +57,7 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
 
     // Send back to Alexa Skill if there is an event.version. Otherwise
     // we know there is an event.messageVersion which is for Lex.
-    if(event.version === undefined) {
+    if(event.messageVersion !== undefined) {
         console.log("Responding To Lex");
 
         callback(null, {
@@ -98,8 +98,8 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
     console.log(`Message: ${message}`);
     console.log(`Validation Event: ${JSON.stringify(event)}`);
 
-    if(event.session === undefined) {
-        console.log("Responding To Lex");
+    if(event.messageVersion !== undefined) {
+        console.log("Validating To Lex");
 
         callback(null, {
             sessionAttributes : event.sessionAttributes,
@@ -115,7 +115,7 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
             },
         });
     } else {
-        console.log("Responding To Alexa");
+        console.log("Validating To Alexa");
 
         callback(null, {
             type : "Dialog.ElicitSlot",
