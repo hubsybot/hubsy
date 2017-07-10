@@ -251,7 +251,7 @@ exports.handler = (event, context, callback) => {
 
                 //Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
-                    var message = 'Consider it done... your call has been logged, keep up the good work!'
+                    var message = 'Ring ring ring! That call has been logged, keep up the good work!'
                     return lambda_helper.processCallback(callback, event, "Fulfilled", message);
                 }).catch((err) => {
                     console.log(err.message)
@@ -305,7 +305,7 @@ exports.handler = (event, context, callback) => {
 
                 //Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
-                    var message = 'Consider it done... your meeting has been logged, keep up the grind!'
+                    var message = 'Your wish is my command... the meeting has been logged, keep up the grind!'
                     return lambda_helper.processCallback(callback, event, "Fulfilled", message);
                 }).catch((err) => {
                     console.log(err.message)
