@@ -7,6 +7,7 @@ exports.parseSlots = (event) => {
     // Parse Amazon Skill slots.
     if(event.request !== undefined) {
         console.log("Parsing Alexa Skills");
+        console.log(`Before Parse: ${JSON.stringify(event.request.intent.slots)}`);
 
         for(var skillKey in event.request.intent.slots) {
             // Keep types the same.
@@ -26,18 +27,21 @@ exports.parseSlots = (event) => {
     // Parse Lex slots.
     if(event.currentIntent !== undefined) {
         console.log("Parsing Lex Skills");
+        console.log(`Before Parse: ${JSON.stringify(event.currentIntent.slots)}`);
 
         for(var lexKey in event.currentIntent.slots) {
             // Keep types the same.
-            if(event.currentIntent.slots[lexKey].value === undefined) {
+            if(event.currentIntent.slots[lexKey] === undefined) {
                 event.currentIntent.slots[lexKey] = null;
-            } else if(event.currentIntent.slots[lexKey].value !== null) {
-                event.currentIntent.slots[lexKey].value = event.currentIntent.slots[lexKey].value.toLowerCase();
+            } else if(event.currentIntent.slots[lexKey] !== null) {
+                event.currentIntent.slots[lexKey] = event.currentIntent.slots[lexKey].toLowerCase();
+            } else {
+                event.currentIntent.slots[lexKey] = null;
             }
 
             slots[lexKey] = {
                 name  : lexKey,
-                value : event.currentIntent.slots[lexKey].value
+                value : event.currentIntent.slots[lexKey]
             };
         }
     }
