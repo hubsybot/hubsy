@@ -29,15 +29,15 @@ exports.parseSlots = (event) => {
 
         for(var lexKey in event.currentIntent.slots) {
             // Keep types the same.
-            if(event.currentIntent.slots[lexKey] === undefined) {
+            if(event.currentIntent.slots[lexKey].value === undefined) {
                 event.currentIntent.slots[lexKey] = null;
-            } else if(event.currentIntent.slots[lexKey] !== null) {
+            } else if(event.currentIntent.slots[lexKey].value !== null) {
                 event.currentIntent.slots[lexKey].value = event.currentIntent.slots[lexKey].value.toLowerCase();
             }
 
             slots[lexKey] = {
                 name  : lexKey,
-                value : event.currentIntent.slots[lexKey].value.toLowerCase()
+                value : event.currentIntent.slots[lexKey].value
             };
         }
     }
