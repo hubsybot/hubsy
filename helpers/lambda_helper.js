@@ -12,7 +12,7 @@ exports.parseSlots = (event) => {
             // Keep types the same.
             if(event.request.intent.slots[skillKey].value === undefined) {
                 event.request.intent.slots[skillKey].value = null;
-            } else {
+            } else if(event.request.intent.slots[skillKey].value !== null) {
                 event.request.intent.slots[skillKey].value = event.request.intent.slots[skillKey].value.toLowerCase();
             }
 
@@ -31,7 +31,7 @@ exports.parseSlots = (event) => {
             // Keep types the same.
             if(event.currentIntent.slots[lexKey] === undefined) {
                 event.currentIntent.slots[lexKey] = null;
-            } else {
+            } else if(event.currentIntent.slots[lexKey] !== undefined) {
                 event.currentIntent.slots[lexKey].value = event.currentIntent.slots[lexKey].value.toLowerCase();
             }
 
