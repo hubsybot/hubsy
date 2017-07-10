@@ -25,10 +25,8 @@ exports.handler = (event, context, callback) => {
     console.log("beginning check", event.sessionAttributes)
     var slots        = lambda_helper.parseSlots(event);
     var sessionAttributes = event.sessionAttributes || {};
-
+    var message  = ""; 
     var owner_id = null;
-
-
 
     var engagement_data = {
         "engagement": {
@@ -45,7 +43,6 @@ exports.handler = (event, context, callback) => {
         },
         "attachments": [],
         "metadata": {
-            "body": null
         }
     }
 
@@ -207,28 +204,41 @@ exports.handler = (event, context, callback) => {
      * Engagement Meta Data
      */
     
-    // Build Object to post.
+    // Start to fill out engagement object to post.
     engagement_data.engagement.ownerId = sales_person
     engagement_data.engagement.type = engagement_type
     engagement_data.associations.contactIds = [selected_contact_id]
 
+    // The rest will depend upon the engagement type.
     if(contact_confirmation === 'yes' && (slots.meta_confirmation.value === null || slots.meta_confirmation.value !== 'yes' || slots.meta_confirmation.value !== 'no')) {
-        console.log('confirmed null meta')
-        if(slots.engagements.value === 'CALL') {            
+        if(slots.engagements.value === 'CALL') {
+            
             // Call step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 console.log('Meta Event', event)
                 sessionAttributes.engagement_step = 1
                 event.sessionAttributes = sessionAttributes
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What was the outcome of this call?`);
+                message = 'Was your call answered or did they just ghost you? (answer, no answer)'
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
+            
             // Call step 2
-            } else if (parseInt(sessionAttributes.engagement_step) === 1) {
-                console.log(event.inputTranscript)
-                engagement_data.metadata.status = event.inputTranscript 
+            } else if (parseInt(sessionAttributes.engagement_step) === 1) {                
+                var call_status = event.inputTranscript
+                // answered or no answer
+                if(call_status.toLowerCase() === 'no answer') {
+                    call_status = 'NO_ANSWER';
+                } else {
+                    call_status = 'COMPLETED';
+                };
+
+                //Add meta data to engagement object.
+                engagement_data.metadata.status = call_status
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data)
                 sessionAttributes.engagement_step = 2
-                event.sessionAttributes = sessionAttributes                
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", `Great any notes on this call?`);
+                event.sessionAttributes = sessionAttributes
+                message = 'Ok great, give me a brief summary of the call to log.'           
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
+            
             // Call step 3
             } else if (parseInt(sessionAttributes.engagement_step) === 2) {
                 //Add meta data to engagement object.
@@ -240,85 +250,124 @@ exports.handler = (event, context, callback) => {
                 console.log('engagement_data', engagement_data)
 
                 //Make Hubspot Post
-                //
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
-                    console.log(body)
-                    return lambda_helper.processValidation(callback, event, "meta_confirmation", 
-                        `Are you ready for me to log a call that took place between you and ${selected_contact_id} with
-                        a status of ${engagement_data.metadata.status} and the following notes: ${engagement_data.metadata.body} (yes,) 
-                    `);
+                    var message = 'Consider it done... your call has been logged, keep up the good work!'
+                    return lambda_helper.processCallback(callback, event, "Fulfilled", message);
                 }).catch((err) => {
                     console.log(err.message)
                     return lambda_helper.processCallback(callback, event, "Failed", err.message);
-                });                
-            }            
+                });
+            };
+
         } else if(slots.engagements.value === 'EMAIL') {
+
             // Email step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 console.log('Meta Event', event)
                 sessionAttributes.engagement_step = 1
                 event.sessionAttributes = sessionAttributes
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", `Copy and Paste the email to me`);
+                message = `Give me the body of the email or in the interest of robot time just give me the gist!`
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
+
             // Email step 2
             } else if (parseInt(sessionAttributes.engagement_step) === 1) {
-                //Add meta data to engagement object. 
-                engagement_data.metadata.body = event.inputTranscript 
+                console.log(event.inputTranscript)
+                engagement_data.metadata.text = event.inputTranscript 
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data)
-                event.sessionAttributes = sessionAttributes                
-                console.log('Meta Event', event)
-                console.log('engagement_data', engagement_data)
+                event.sessionAttributes = sessionAttributes
 
                 //Make Hubspot Post
-                //
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", 
-                    `Are you ready for me to log a email that took place between you and ${selected_contact_id} with
-                    a status of ${engagement_data.metadata.status} and the following notes: ${engagement_data.metadata.body} (yes,) 
-                `);
-            // Email step 3
-            }
+                hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
+                    var message = 'Consider it done... your email has been logged, keep up the good work!'
+                    return lambda_helper.processCallback(callback, event, "Fulfilled", message);
+                }).catch((err) => {
+                    console.log(err.message)
+                    return lambda_helper.processCallback(callback, event, "Failed", err.message);
+                });
+            };
+
         } else if(slots.engagements.value === 'MEETING') {
+            
             // Meeting step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 console.log('Meta Event', event)
                 sessionAttributes.engagement_step = 1
                 event.sessionAttributes = sessionAttributes
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What was the outcome of this call?`);
+                message = `Awesome, tell me how the meeting went!`
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
+                
             // Meeting step 2
             } else if (parseInt(sessionAttributes.engagement_step) === 1) {
                 console.log(event.inputTranscript)
-                engagement_data.metadata.status = event.inputTranscript 
+                engagement_data.metadata.body = event.inputTranscript 
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data)
-                sessionAttributes.engagement_step = 2
-                event.sessionAttributes = sessionAttributes                
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", `Great any notes on this call?`);
-            // Meeting step 3
-            } else if (parseInt(sessionAttributes.engagement_step) === 2) {
-                //Add meta data to engagement object.
-                engagement_data = JSON.parse(sessionAttributes.engagement_data)
-                engagement_data.metadata.body = event.inputTranscript
-                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
-                event.sessionAttributes = sessionAttributes 
-                console.log('Meta Event', event)
-                console.log('engagement_data', engagement_data)
+                event.sessionAttributes = sessionAttributes
 
                 //Make Hubspot Post
-                //
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", 
-                    `Are you ready for me to log a meeting that took place between you and ${selected_contact_id} with
-                    a status of ${engagement_data.metadata.status} and the following notes: ${engagement_data.metadata.body} (yes,) 
-                `);
-            }             
-        }
-        else if(slots.engagements.value === 'TASK') {
-            if(slots.body.value === null) {
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What would`);
-            }            
-        }
-        else if(slots.engagements.value === 'NOTE') {
-            if(slots.body.value === null) {
-                return lambda_helper.processValidation(callback, event, "meta_confirmation", `What would`);
-            }            
-        }                                
-    }
+                hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
+                    var message = 'Consider it done... your meeting has been logged, keep up the grind!'
+                    return lambda_helper.processCallback(callback, event, "Fulfilled", message);
+                }).catch((err) => {
+                    console.log(err.message)
+                    return lambda_helper.processCallback(callback, event, "Failed", err.message);
+                });
+            };
 
+        } else if(slots.engagements.value === 'TASK') {
+
+            // Task step 1
+            if(parseInt(sessionAttributes.engagement_step) === 0) {
+                console.log('Meta Event', event)
+                sessionAttributes.engagement_step = 1
+                event.sessionAttributes = sessionAttributes
+                message = `What would you like ${slots.sales.value} to do?`
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
+                
+            // Task step 2
+            } else if (parseInt(sessionAttributes.engagement_step) === 1) {
+                console.log(event.inputTranscript)
+                engagement_data.metadata.body = event.inputTranscript
+                engagement_data.metadata.status = "NOT_STARTED"
+                engagement_data.metadata.forObjectType = "CONTACT"
+                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
+                event.sessionAttributes = sessionAttributes
+
+                //Make Hubspot Post
+                hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
+                    var message = 'Sounds good, I relayed the message. Do you think I could send some robot work in their direction while we are at it?'
+                    return lambda_helper.processCallback(callback, event, "Fulfilled", message);
+                }).catch((err) => {
+                    console.log(err.message)
+                    return lambda_helper.processCallback(callback, event, "Failed", err.message);
+                });
+            };
+
+        } else if(slots.engagements.value === 'NOTE') {
+
+            // Note step 1
+            if(parseInt(sessionAttributes.engagement_step) === 0) {
+                console.log('Meta Event', event)
+                sessionAttributes.engagement_step = 1
+                event.sessionAttributes = sessionAttributes
+                message = `Thats an easy one! What should the note say?`
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
+                
+            // Note step 2
+            } else if (parseInt(sessionAttributes.engagement_step) === 1) {
+                console.log(event.inputTranscript)
+                engagement_data.metadata.body = event.inputTranscript
+                sessionAttributes.engagement_data = JSON.stringify(engagement_data)
+                event.sessionAttributes = sessionAttributes
+
+                //Make Hubspot Post
+                hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then((body) => {
+                    var message = 'I am a professional note taker by design. All set! (pats robot back)'
+                    return lambda_helper.processCallback(callback, event, "Fulfilled", message);
+                }).catch((err) => {
+                    console.log(err.message)
+                    return lambda_helper.processCallback(callback, event, "Failed", err.message);
+                });
+            };          
+        };                                
+    };
 };
