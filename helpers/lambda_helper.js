@@ -32,7 +32,7 @@ exports.parseSlots = (event) => {
             if(event.currentIntent.slots[lexKey] === undefined) {
                 event.currentIntent.slots[lexKey] = null;
             } else {
-                event.currentIntent.slots[lexKey].value = event.request.intent.slots[lexKey].value.toLowerCase();
+                event.currentIntent.slots[lexKey].value = event.currentIntent.slots[lexKey].value.toLowerCase();
             }
 
             slots[lexKey] = {
