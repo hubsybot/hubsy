@@ -31,7 +31,7 @@ exports.parseSlots = (event) => {
             // Keep types the same.
             if(event.currentIntent.slots[lexKey] === undefined) {
                 event.currentIntent.slots[lexKey] = null;
-            } else if(event.currentIntent.slots[lexKey] !== undefined) {
+            } else if(event.currentIntent.slots[lexKey] !== null) {
                 event.currentIntent.slots[lexKey].value = event.currentIntent.slots[lexKey].value.toLowerCase();
             }
 
