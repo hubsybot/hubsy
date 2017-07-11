@@ -196,15 +196,15 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
 
         // Create the cards based on the slot to elicit.
         if(slot_to_elicit === "stage") {
-            response.dialogAction.responseCard = createCard(getStageCards("What stage would you like me to lookup?"));
+            response.dialogAction.responseCard = createCard(getStageCards("What stage would you like?"));
             response.dialogAction.message = null;
         } else if(slot_to_elicit === "sales" || slot_to_elicit === "salesOne" || slot_to_elicit === "salesTwo") {
             if(slot_to_elicit === "salesOne") {
-                response.dialogAction.responseCard = createCard(getSalesCards("What sales person would you like me to lookup first?"));
+                response.dialogAction.responseCard = createCard(getSalesCards("What sales person would you like first?"));
             } else if(slot_to_elicit === "salesTwo") {
-                response.dialogAction.responseCard = createCard(getSalesCards("What sales person would you like me to compare the first with?"));
+                response.dialogAction.responseCard = createCard(getSalesCards("What sales person would you like me to compare with?"));
             } else {
-                response.dialogAction.responseCard = createCard(getSalesCards("What sales person would you like me to lookup?"));
+                response.dialogAction.responseCard = createCard(getSalesCards("What sales person would you like?"));
             }
 
             response.dialogAction.message = null;
@@ -212,10 +212,10 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
             response.dialogAction.responseCard = createCard(getConfirmationCards(message));
             response.dialogAction.message = null;
         } else if(slot_to_elicit === "engagements") {
-            response.dialogAction.responseCard = createCard(getEngagmentCards("What engagement would you like me to lookup?"));
+            response.dialogAction.responseCard = createCard(getEngagmentCards("What engagement would you like?"));
             response.dialogAction.message = null;
         } else if(slot_to_elicit === "timeframe") {
-            response.dialogAction.responseCard = createCard(getTimeframeCards("What timeframe would you like me to lookup?"));
+            response.dialogAction.responseCard = createCard(getTimeframeCards("What timeframe would you like?"));
             response.dialogAction.message = null;
         }
 
