@@ -208,7 +208,7 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
             }
 
             response.dialogAction.message = null;
-        } else if(slot_to_elicit === "confirmation") {
+        } else if(slot_to_elicit === "confirmation" || slot_to_elicit === "contact_confirmation") {
             response.dialogAction.responseCard = createCard(getConfirmationCards(message));
             response.dialogAction.message = null;
         } else if(slot_to_elicit === "engagements") {
