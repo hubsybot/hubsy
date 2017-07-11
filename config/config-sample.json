@@ -26,8 +26,5 @@
             "name" : "",
             "guid" : ""
         }
-    ],
-    "elasticsearch" : {
-        "host" : ""
-    }
+    ]
 }
