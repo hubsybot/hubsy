@@ -11,6 +11,11 @@
             "ownerId" : ""
         }
     ],
+    "timeframes" : [
+        {
+            "name" : ""
+        }
+    ],
     "engagements" : [
         {
             "name" : ""
