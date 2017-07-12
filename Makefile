@@ -6,8 +6,8 @@ AWS_PROFILE := ken_bot
 # Launch Terraform in a isolated docker container.
 TERRAFORM := docker run --rm -it -e AWS_PROFILE=${AWS_PROFILE} -e AWS_REGION=${AWS_REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
 
-# Default will be just to do a Terraform plan.
-default: plan
+# Default will run a non destructive eslint.
+default: eslint
 
 # Syncing the website to S3 bucket.
 sync:
@@ -33,9 +33,9 @@ build:
 	npm install --silent && \
 	zip ken_bot.zip -r *.js node_modules config helpers > /dev/null
 
-# Planning will build the Lambda functions, initialize Terraform backend and then
-# do a Terraform plan.
-plan: eslint build init
+# Planning will lint our javascript, sync the landing page to s3, build the
+# Lambda functions, initialize Terraform backend and then do a Terraform plan.
+plan: eslint sync build init
 	${TERRAFORM} plan -var="aws_region=${AWS_REGION}" -out=.terraform/terraform.tfplan
 
 # Run a Terraform apply against the plan that was ran. It will also do a little

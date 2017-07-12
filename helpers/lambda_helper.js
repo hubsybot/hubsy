@@ -8,6 +8,17 @@ var createCard = (cards) => {
     };
 };
 
+var getContactInfoCards = (title) => {
+    var cards = [{ title : title, buttons : [ ] }];
+
+    cards[0].buttons.push({ text : "Summary", value : "summary" });
+    cards[0].buttons.push({ text : "Email", value : "email" });
+    cards[0].buttons.push({ text : "Title", value : "title" });
+    cards[0].buttons.push({ text : "Phone", value : "phone" });
+
+    return cards;
+};
+
 // Constant timeframe cards.
 var getTimeframeCards = (title) => {
     var cards = [{ title : title, buttons : [ ] }];
@@ -217,6 +228,9 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
             response.dialogAction.message = null;
         } else if(slot_to_elicit === "timeframe") {
             response.dialogAction.responseCard = createCard(getTimeframeCards("What timeframe would you like?"));
+            response.dialogAction.message = null;
+        } else if(slot_to_elicit === "contact_info") {
+            response.dialogAction.responseCard = createCard(getContactInfoCards("What contact info would you like?"));
             response.dialogAction.message = null;
         }
 
