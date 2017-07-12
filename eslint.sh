@@ -17,3 +17,5 @@ for filename in helpers/*.js; do
 
     eslint $filename
 done
+
+echo ""
