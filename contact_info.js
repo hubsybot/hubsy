@@ -58,30 +58,54 @@ exports.handler = (event, context, callback) => {
         // The user has confirmed the contact and the contact_id has been established
         hubspot_helper.createRequest(`/contacts/v1/contact/vid/${selected_contact_id}/profile?`, "GET", null).then((body) => {
             var person_data = body[0].properties;
-            var company_data = body[0]['associated-company'].properties;
 
-            var first_name   = "firstname" in person_data ? person_data.firstname.value : null;
-            var last_name    = "lastname" in person_data ? person_data.lastname.value : null;
-            var full_name    = `${first_name} ${last_name}`;
-            var revenue      = "annualrevenue" in person_data ? person_data.annualrevenue.value : null;
-            var email        = "email" in person_data ? person_data.email.value : null;
-            var phone        = "phone" in person_data ? person_data.phone.value : null;
-            var city         = "city" in person_data ? person_data.city.value : null;
-            var state        = "state" in person_data ? person_data.state.value : null;
-            var address      = "address" in person_data ? person_data.address.value : null;
-            var job_title    = "jobtitle" in person_data ? person_data.jobtitle.value : null;
-            var company_name = "name" in company_data ? company_data.name.value : null;
-            var company_fb   = "facebook_company_page" in company_data ? company_data.facebook_company_page.value : null;
+            var company_data = null;
+            var company_name = null;
+
+            if(body[0]['associated-company'] !== undefined) {
+                company_data = body[0]['associated-company'].properties;
+                company_name = "name" in company_data ? company_data.name.value : null;
+            }
+
+            var first_name = "firstname" in person_data ? person_data.firstname.value : null;
+            var last_name  = "lastname" in person_data ? person_data.lastname.value : null;
+            var full_name  = `${first_name} ${last_name}`;
+            var revenue    = "annualrevenue" in person_data ? person_data.annualrevenue.value : null;
+            var email      = "email" in person_data ? person_data.email.value : null;
+            var phone      = "phone" in person_data ? person_data.phone.value : null;
+            var city       = "city" in person_data ? person_data.city.value : null;
+            var state      = "state" in person_data ? person_data.state.value : null;
+            var address    = "address" in person_data ? person_data.address.value : null;
+            var job_title  = "jobtitle" in person_data ? person_data.jobtitle.value : null;
 
             if(contact_info.includes("summary")) {
-                content = `Here's what I found on ${full_name}...
-                This indvidual works at ${company_name} (check them out on facebook here -> ${company_fb}
-                Hailing from ${city}, ${state} he/she is worth $${revenue} to us.
-                I'll just get to the point:
-                Phone: ${phone}
-                Email: ${email}
-                Address: ${address}
-                `;
+                content = `Here's what I found on ${full_name}. `;
+
+                if(company_name !== null) {
+                    content = content + `This indvidual works at ${company_name}. `;
+                }
+
+                if(city !== null && state !== null) {
+                    content = content + `Hailing from ${city}, ${state}. `;
+                }
+
+                if(revenue !== null) {
+                    content = content + `They are worth $${revenue} to us. `;
+                }
+
+                content = content + `I'll just get to the point though. `;
+
+                if(phone !== null) {
+                    content = content + `Their phone number is ${phone}. `;
+                }
+
+                if(email !== null) {
+                    content = content + `Their email is ${email}. `;
+                }
+
+                if(address !== null) {
+                    content = content + `Their address is ${address}. `;
+                }
             } else if(contact_info.includes("email")) {
                 if(person_data.email.value === null) {
                     return lambda_helper.processValidation(callback, event, "contact_info", `Oops, email is unavailable for ${full_name} want something else? (title, phone)`);

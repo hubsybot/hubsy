@@ -52,6 +52,8 @@ exports.createRequest = (path, method, payload) => {
 
                                 next(options);
                             } else {
+                                console.log(`Parsed Hubspot Request: ${JSON.stringify(data)}`);
+
                                 resolve(data);
                             }
                         }
