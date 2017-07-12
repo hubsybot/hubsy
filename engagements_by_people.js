@@ -54,6 +54,7 @@ exports.handler = (event, context, callback) => {
      */
     var sales_person_id = false;
     var sales_name      = null;
+    var owner_id        = null;
 
     if(slots.sales.value === null) {
         return lambda_helper.processValidation(callback, event, "sales", "Who is the sales person you want to lookup?");
@@ -63,6 +64,7 @@ exports.handler = (event, context, callback) => {
         if(slots.sales.value.includes(person.first) === true || slots.sales.value.includes(person.last) === true) {
             sales_person_id = parseInt(person.ownerId);
             sales_name      = slots.sales.value;
+            ownder_id       = person.ownerId
         }
     });
 
