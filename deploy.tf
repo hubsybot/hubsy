@@ -5,6 +5,42 @@
 terraform { backend "s3" { } }
 
 #
+# S3 Bucket
+#
+
+resource "aws_s3_bucket" "hubsy" {
+    bucket = "www.hubsybot.com"
+
+    cors_rule {
+        allowed_methods = ["GET", "HEAD"]
+        allowed_origins = ["*"]
+    }
+
+    website {
+        index_document = "index.html"
+        error_document = "index.html"
+    }
+}
+
+resource "aws_s3_bucket_policy" "hubsy" {
+    bucket = "${aws_s3_bucket.hubsy.id}"
+    policy = "${data.aws_iam_policy_document.hubsy.json}"
+}
+
+data "aws_iam_policy_document" "hubsy" {
+    statement {
+        actions = ["s3:GetObject"]
+        resources = ["arn:aws:s3:::${aws_s3_bucket.hubsy.id}/*"]
+
+        principals {
+            type = "AWS"
+            identifiers = ["*"]
+        }
+    }
+}
+
+
+#
 # Configuration
 #
 

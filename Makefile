@@ -1,12 +1,17 @@
 # Configuration variables.
 TERRAFORM_VERSION := 0.9.9
 AWS_REGION := us-east-1
+AWS_PROFILE := ken_bot
 
 # Launch Terraform in a isolated docker container.
-TERRAFORM := docker run --rm -it -e AWS_PROFILE=ken_bot -e AWS_REGION=${AWS_REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
+TERRAFORM := docker run --rm -it -e AWS_PROFILE=${AWS_PROFILE} -e AWS_REGION=${AWS_REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
 
 # Default will be just to do a Terraform plan.
 default: plan
+
+# Syncing the website to S3 bucket.
+sync:
+	AWS_PROFILE=${AWS_PROFILE} aws s3 sync ./landing/ s3://www.hubsybot.com/ --exclude ".DS_Store"
 
 # Lint the JS files.
 eslint:

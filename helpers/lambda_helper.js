@@ -138,12 +138,13 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
         console.log("Responding To Lex");
 
         callback(null, {
-            "dialogAction" : {
-                "type" : "Close",
-                "fulfillmentState" : fulfillmentState,
-                "message" : {
-                    "contentType" : "PlainText",
-                    "content" : message
+            sessionAttributes : {},
+            dialogAction : {
+                type : "Close",
+                fulfillmentState : fulfillmentState,
+                message : {
+                    contentType : "PlainText",
+                    content : message
                 }
             }
         });
@@ -229,7 +230,7 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
 
         response = {
             version : "1.0",
-            sessionAttributes : {},
+            sessionAttributes : event.sessionAttributes,
             response : {
                 outputSpeech : {
                     type : "PlainText",
