@@ -30,10 +30,10 @@ TODO (Write a description)
 * IAM - Profiles for our Lambda functions.
 * CloudWatch Logs - Where our logs go for our Lambda functions.
 * Amazon Alexa Skill Developer - Area where we develop our Alexa skill.
-* Route 53 - Where we registered our bot domain. // @TODO
-* S3 - Where we store our Terraform state as well as our static homepage. // @TODO
-* CloudFront - Caches our website. // @TODO
-* Certificate Manager - Gives us the SSL certificate. // @TODO
+* Route 53 - Where we registered our bot domain.
+* S3 - Where we store our Terraform state as well as our static homepage.
+* CloudFront - Caches our website.
+* Certificate Manager - Gives us the SSL certificate. 
 
 ## Contributing
 
