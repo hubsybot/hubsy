@@ -39,7 +39,6 @@ data "aws_iam_policy_document" "hubsy" {
     }
 }
 
-
 #
 # Configuration
 #
@@ -270,7 +269,7 @@ resource "aws_lambda_permission" "total_in_deals_lex" {
     source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.total_in_deals.function_name}:*"
 }
 
-# Alexa
+# Alexa Router
 
 resource "aws_lambda_permission" "alexa_router" {
     statement_id = "alexa_router"

@@ -1,18 +1,15 @@
 {
   "name": "ken-bot",
   "version": "0.0.1",
-  "description": "Ken bot is an interactive chatbot that will give the user information about their Hubspot account.",
-  "main": "server.js",
+  "description": "Hubsy the HubSpot bot is your own personal assistant to help you manage your HubSpot account!",
   "repository": {
     "type": "git",
     "url": ""
   },
-  "author": "Ken Bot",
+  "author": "Hubsy",
   "dependencies": {
     "bluebird": "^3.5.0",
-    "elasticsearch": "^13.2.0",
     "moment": "^2.18.1",
-    "request": "^2.81.0",
-    "string-similarity": "^1.2.0"
+    "request": "^2.81.0"
   }
 }

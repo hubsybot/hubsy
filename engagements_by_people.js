@@ -7,9 +7,9 @@
  *   meetings, and calls specfied under engagement type.
  *
  * Slot Types:
- * 	 engagement_type : {null, note, email, task, meeting, call}
- *   sales           : {null, andrew, andy, john}
- *   timeframe       : {null, today, yesterday, this week, last week, this month, last month, this year}
+ * 	 engagement_type : {note, email, task, meeting, call}
+ *   sales           : {andrew, andy, john}
+ *   timeframe       : {today, yesterday, this week, last week, this month, last month, this year}
  *
  * Commands:
  *   How many {engagements} have been made?
@@ -88,18 +88,17 @@ exports.handler = (event, context, callback) => {
     hubspot_helper.createRequest("/engagements/v1/engagements/paged?", "GET", null).then((body) => {
         var num_engagements = 0;
 
-        // Loop through each of the engagements and if one matches the provided criteria then increase the counter.
-        // Engagement info -> https://developers.hubspot.com/docs/methods/engagements/engagements-overview
         body.forEach((data) => {
             data.results.forEach((engagement) => {
                 var timestamp = moment(engagement.engagement.timestamp).startOf("date");
 
-                // Test to see if engagement's timestamp is within requested range.
+
                 var timeframe_in_range = false;
 
+                // Test to see if engagement's timestamp is within requested range.
+                // Or in the case where there is a range of timeframes (ie. last week)
                 if(timeframe.range === false) {
                     timeframe_in_range = timeframe.operator(timestamp, timeframe.comparable);
-                // In case there is a range of timeframes (ie. last week)
                 } else {
                     timeframe_in_range = timeframe.operator(timestamp, timeframe.comparable_low, timeframe.comparable_high);
                 }
@@ -116,9 +115,9 @@ exports.handler = (event, context, callback) => {
         var message = "";
 
         if(sales_name !== null) {
-            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${timeframe.name} by ${sales_name}.`;
+            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${slots.timeframe.value} by ${sales_name}.`;
         } else {
-            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${timeframe.name}.`;
+            message = `Looks like ${num_engagements} ${engagement_type.toLowerCase()}(s) were logged ${slots.timeframe.value}.`;
         }
 
         return lambda_helper.processCallback(callback, event, "Fulfilled", message);

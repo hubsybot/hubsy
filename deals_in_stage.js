@@ -6,9 +6,9 @@
  *   Getting the number of deals that are in a specific stage of HubSpot.
  *
  * Slot Types:
- * 	 stage        : {null, discovery, quote, negotiate, lost, won}
- *   sales        : {null, andrew, andy, john}
- *   confirmation : {null, yes, no}
+ * 	 stage        : {discovery, quote, negotiate, lost, won}
+ *   sales        : {andrew, andy, john}
+ *   confirmation : {yes, no}
  *
  * Commands:
  *   How many deals are in the {stage} stage.

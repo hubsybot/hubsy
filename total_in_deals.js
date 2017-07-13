@@ -6,7 +6,7 @@
  *   Getting the total value of deals in a specific stage.
  *
  * Slot Types:
- * 	 stage : {null, discovery, quote, negotiate, lost, won}
+ * 	 stage : {discovery, quote, negotiate, lost, won}
  *
  * Commands:
  *   What is the total value of deals in the {stage}​ stage.

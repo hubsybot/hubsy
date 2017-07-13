@@ -8,9 +8,9 @@
  *   figure out who performed the most.
  *
  * Slot Types:
- * 	 engagement_type : {null, note, email, task, meeting, call}
- *   salesOne        : {null, andrew, andy, john}
- *   salesTwo        : {null, andrew, andy, john}
+ * 	 engagement_type : {note, email, task, meeting, call}
+ *   salesOne        : {andrew, andy, john}
+ *   salesTwo        : {andrew, andy, john}
  *   timeframe       : {today, yesterday, this week, last week, this month, last month, this year}
  *
  * Commands:
@@ -94,13 +94,13 @@ exports.handler = (event, context, callback) => {
      * Timeframe
      */
     if(slots.timeframe.value === null) {
-        return lambda_helper.processValidation(callback, event, "timeframe", "What timeframe would you like to compare? Yesterday, last week, or last month?");
+        return lambda_helper.processValidation(callback, event, "timeframe", "What timeframe would you like to compare? Say something like yesterday, last week, or last month?");
     }
 
     var timeframe = time_helper.timeframe_check(slots.timeframe.value);
 
     if(timeframe === false) {
-        return lambda_helper.processValidation(callback, event, "timeframe", "I did not understand that timeframe. What timeframe would you like to compare? Yesterday, last week, or last month?");
+        return lambda_helper.processValidation(callback, event, "timeframe", "I did not understand that timeframe. What timeframe would you like to compare? Say something like yesterday, last week, or last month?");
     }
 
     // Create the request into hubspot using the helper.

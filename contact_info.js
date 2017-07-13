@@ -1,14 +1,14 @@
 /**
  * Intent:
- *   EngagementsByPeople
+ *   ContactInfo
  *
  * Description:
  *   This command will get the contact information for a given contact in HubSpot.
  *
  * Slot Types:
- * 	 engagement_type : {null, note, email, task, meeting, call}
- *   sales_name      : {null, andrew, andy, john}
- *   timeframe       : {null, today, yesterday, this week, last week, this month, last month, this year}
+ * 	 contact_info : {email, title, name, phone, all}
+ *   contacts     : {(massive list of potential names for Lex to learn)}
+ *   confirmation : {yes, no}
  *
  * Commands:
  *   Can you tell me contact info for {contact}?
@@ -30,28 +30,25 @@ exports.handler = (event, context, callback) => {
     var contact_list = null;
 
     if(contact_slot === null) {
-        // Lex didnt recognize the slot name
         return lambda_helper.processCallback(callback, event, "Failed", "We did not recognize the results name.");
     }
 
     // Define the properties we want back from hubspot
-    var hubspot_properties = [
-       'associatedcompanyid',
-       'jobtitle',
-       'firstname',
-       'lastname'
-    ];
-    hubspot_properties = '&property=' + hubspot_properties.join('&property=');
+    var hubspot_properties = "&property=" + ["associatedcompanyid", "jobtitle", "firstname", "lastname"].join("&property=");
 
+    // If we got the correct user for the client and they say yes we will get the info.
+    // Otherwise if the user denied the last contact we showed them we will present
+    // any others that we have.
     if(confirmation === "yes") {
-        if(event.invocationSource === "DialogCodeHook" && contact_info === null) {
+        if(contact_info === null) {
             // If we do not have the contact_info value we want to request send a followup.
             return lambda_helper.processValidation(callback, event, "contact_info", "What type of information would you like to get? (summary, email, title, phone)");
         }
 
         // The user selected the last result
-        confirmation_counter = parseInt(event.sessionAttributes.confirmation_count) - 1;
-        contact_list         = JSON.parse(event.sessionAttributes.contact);
+        confirmation_counter     = parseInt(event.sessionAttributes.confirmation_count) - 1;
+        contact_list             = JSON.parse(event.sessionAttributes.contact);
+
         var selected_contact     = contact_list[confirmation_counter];
         var selected_contact_id  = selected_contact.contact_id;
 
@@ -62,8 +59,8 @@ exports.handler = (event, context, callback) => {
             var company_data = null;
             var company_name = null;
 
-            if(body[0]['associated-company'] !== undefined) {
-                company_data = body[0]['associated-company'].properties;
+            if(body[0]["associated-company"] !== undefined) {
+                company_data = body[0]["associated-company"].properties;
                 company_name = "name" in company_data ? company_data.name.value : null;
             }
 
@@ -136,7 +133,6 @@ exports.handler = (event, context, callback) => {
         }).catch((err) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });
-    // User denied the last contact we showed them.
     } else if(confirmation === "no") {
         contact_list         = JSON.parse(event.sessionAttributes.contact);
         confirmation_counter = parseInt(event.sessionAttributes.confirmation_count);
@@ -155,14 +151,13 @@ exports.handler = (event, context, callback) => {
         // Reset sessionAttributes to return to lex.
         sessionAttributes.confirmation_count = confirmation_counter;
         sessionAttributes.contact = JSON.stringify(contact_list);
+        
         event.sessionAttributes = sessionAttributes;
 
         return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}, who you are looking for? (yes, no)`);
-
     // We haven't supplied the user with a contact to confirm yet.
     } else if(confirmation === null) {
-        // Create the request into hubspot using the helper.
-        // Contacts search -> https://developers.hubspot.com/docs/methods/contacts/search_contacts
+        // Search for the contacts in HubSpot
         hubspot_helper.createRequest(`/contacts/v1/search/query?q=${contact_slot}${hubspot_properties}`, "GET", null).then((body) => {
             var contact_list    = [];
 
@@ -170,12 +165,14 @@ exports.handler = (event, context, callback) => {
             body.forEach((data) => {
                 data.contacts.forEach((result) => {
                     var contact           = {};
+
                     contact.contact_id    = "vid" in result ? result.vid : null;
                     contact.assoc_comp_id = "associatedcompanyid" in result.properties ? result.properties.associatedcompanyid.value : null;
                     contact.first_name    = "firstname" in result.properties ? result.properties.firstname.value : null;
                     contact.last_name     = "lastname" in result.properties ? result.properties.lastname.value : null;
                     contact.job_title     = "jobtitle" in result.properties ? result.properties.jobtitle.value : null;
                     contact.full_name     = `${contact.first_name} ${contact.last_name}`;
+
                     contact_list.push(contact);
                 });
             });
@@ -195,6 +192,7 @@ exports.handler = (event, context, callback) => {
             // Set session attributes for lex.
             sessionAttributes.confirmation_count = confirmation_counter;
             sessionAttributes.contact = JSON.stringify(contact_list);
+
             event.sessionAttributes = sessionAttributes;
 
             return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}... who you are looking for? (yes, no)`);
