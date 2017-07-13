@@ -53,9 +53,9 @@ variable "lambda_memory" { default = {
     high = "512"
 }}
 variable "lambda_timeout" { default = {
-    low = "30"
-    medium = "60"
-    high = "120"
+    low = "60"
+    medium = "120"
+    high = "240"
 }}
 
 #
@@ -101,12 +101,12 @@ resource "aws_cloudwatch_log_group" "alexa_router" {
 # Roles
 #
 
-resource "aws_iam_role" "ken_bot" {
-    name = "ken_bot"
-    assume_role_policy = "${data.aws_iam_policy_document.ken_bot_lambda_assume_role_policy.json}"
+resource "aws_iam_role" "hubsy" {
+    name = "hubsy"
+    assume_role_policy = "${data.aws_iam_policy_document.hubsy_lambda_assume_role_policy.json}"
 }
 
-data "aws_iam_policy_document" "ken_bot_lambda_assume_role_policy" {
+data "aws_iam_policy_document" "hubsy_lambda_assume_role_policy" {
     statement {
         principals {
             type = "Service"
@@ -116,10 +116,10 @@ data "aws_iam_policy_document" "ken_bot_lambda_assume_role_policy" {
     }
 }
 
-resource "aws_iam_policy_attachment" "ken_bot_attachment" {
-    name = "ken_bot_attachment"
+resource "aws_iam_policy_attachment" "hubsy_attachment" {
+    name = "hubsy_attachment"
     roles = [
-        "${aws_iam_role.ken_bot.id}"
+        "${aws_iam_role.hubsy.id}"
     ]
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
@@ -129,77 +129,77 @@ resource "aws_iam_policy_attachment" "ken_bot_attachment" {
 #
 
 resource "aws_lambda_function" "create_engagement" {
-    filename = "./ken_bot.zip"
+    filename = "./hubsy.zip"
     function_name = "create_engagement"
-    role = "${aws_iam_role.ken_bot.arn}"
+    role = "${aws_iam_role.hubsy.arn}"
     handler = "create_engagement.handler"
-    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
     timeout = "${var.lambda_timeout["low"]}"
 }
 
 resource "aws_lambda_function" "contact_info" {
-    filename = "./ken_bot.zip"
+    filename = "./hubsy.zip"
     function_name = "contact_info"
-    role = "${aws_iam_role.ken_bot.arn}"
+    role = "${aws_iam_role.hubsy.arn}"
     handler = "contact_info.handler"
-    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
     timeout = "${var.lambda_timeout["low"]}"
 }
 
 resource "aws_lambda_function" "deals_in_stage" {
-    filename = "./ken_bot.zip"
+    filename = "./hubsy.zip"
     function_name = "deals_in_stage"
-    role = "${aws_iam_role.ken_bot.arn}"
+    role = "${aws_iam_role.hubsy.arn}"
     handler = "deals_in_stage.handler"
-    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
     timeout = "${var.lambda_timeout["low"]}"
 }
 
 resource "aws_lambda_function" "total_in_deals" {
-    filename = "./ken_bot.zip"
+    filename = "./hubsy.zip"
     function_name = "total_in_deals"
-    role = "${aws_iam_role.ken_bot.arn}"
+    role = "${aws_iam_role.hubsy.arn}"
     handler = "total_in_deals.handler"
-    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
     timeout = "${var.lambda_timeout["low"]}"
 }
 
 resource "aws_lambda_function" "engagements_by_people" {
-    filename = "./ken_bot.zip"
+    filename = "./hubsy.zip"
     function_name = "engagements_by_people"
-    role = "${aws_iam_role.ken_bot.arn}"
+    role = "${aws_iam_role.hubsy.arn}"
     handler = "engagements_by_people.handler"
-    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
     timeout = "${var.lambda_timeout["low"]}"
 }
 
 resource "aws_lambda_function" "compare_sales_people" {
-    filename = "./ken_bot.zip"
+    filename = "./hubsy.zip"
     function_name = "compare_sales_people"
-    role = "${aws_iam_role.ken_bot.arn}"
+    role = "${aws_iam_role.hubsy.arn}"
     handler = "compare_sales_people.handler"
-    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
     timeout = "${var.lambda_timeout["low"]}"
 }
 
 resource "aws_lambda_function" "alexa_router" {
-    filename = "./ken_bot.zip"
+    filename = "./hubsy.zip"
     function_name = "alexa_router"
-    role = "${aws_iam_role.ken_bot.arn}"
+    role = "${aws_iam_role.hubsy.arn}"
     handler = "alexa_router.handler"
-    source_code_hash = "${base64sha256(file("./ken_bot.zip"))}"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
     timeout = "${var.lambda_timeout["low"]}"

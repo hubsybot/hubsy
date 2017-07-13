@@ -1,7 +1,7 @@
 # Configuration variables.
 TERRAFORM_VERSION := 0.9.9
 AWS_REGION := us-east-1
-AWS_PROFILE := ken_bot
+AWS_PROFILE := hubsy
 
 # Launch Terraform in a isolated docker container.
 TERRAFORM := docker run --rm -it -e AWS_PROFILE=${AWS_PROFILE} -e AWS_REGION=${AWS_REGION} -v ~/.aws:/root/.aws -v ${PWD}:/data -w /data hashicorp/terraform:${TERRAFORM_VERSION}
@@ -25,13 +25,13 @@ init:
 		-backend-config="bucket=ken-bot-terraform" \
 		-backend-config="key=ken-bot/terraform.tfstate" \
 		-backend-config="region=${AWS_REGION}" \
-		-backend-config="profile=ken_bot" \
+		-backend-config="profile=${AWS_PROFILE}" \
 		-force-copy
 
 # Build the Lambda functions and zip them up to have Terraform ship to Lambda.
 build:
 	npm install --silent && \
-	zip ken_bot.zip -r *.js node_modules config helpers > /dev/null
+	zip hubsy.zip -r *.js node_modules config helpers > /dev/null
 
 # Planning will lint our javascript, sync the landing page to s3, build the
 # Lambda functions, initialize Terraform backend and then do a Terraform plan.

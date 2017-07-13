@@ -2,7 +2,7 @@
 
 Hubsy the HubSpot bot is your own personal assistant to help you manage your HubSpot account! Hubsy was created for an AWS Hackathon but if you would like to install it for your own company let us know! The bot is accessible on Slack, Facebook and Alexa.
 
-## Commands (Potential utterances that start conversations)
+## Sample utterances that start conversations
 
 ### Create Engagements
 * Create a task
@@ -44,8 +44,9 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 
 ## Make
 
-* `make eslint` - Run ESLint against our js files.
+* `make eslint` - Run ESLint against our JS files for coding standards.
 * `make build`  - Zips the Lambda functions for terraform to send to Lambda.
+* `make sync`   - Sync the landing page website to S3.
 * `make plan`   - Creates a Terraform plan to deploy infrastructure changes.
 * `make apply`  - Applies the terraform plan (requires `make plan` first).
 
