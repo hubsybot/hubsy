@@ -4,7 +4,7 @@ const bluebird = require("bluebird");
 
 // Simple wrapper for creating a request in Node.
 exports.createRequest = (path, method, payload) => {
-    var url = "https://api.hubapi.com" + path + "&hapikey=" + config.hubspot.api_key + "&limit=5";
+    var url = "https://api.hubapi.com" + path + "&hapikey=" + config.hubspot.api_key;
 
     console.log("HubSpot URL: " + url);
 

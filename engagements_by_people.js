@@ -64,7 +64,7 @@ exports.handler = (event, context, callback) => {
         if(slots.sales.value.includes(person.first) === true || slots.sales.value.includes(person.last) === true) {
             sales_person_id = parseInt(person.ownerId);
             sales_name      = slots.sales.value;
-            ownder_id       = person.ownerId;
+            owner_id        = parseInt(person.ownerId);
         }
     });
 
