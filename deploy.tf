@@ -62,8 +62,8 @@ variable "lambda_timeout" { default = {
 # CloudWatch Logs
 #
 
-resource "aws_cloudwatch_log_group" "create_engagement" {
-    name = "/aws/lambda/create_engagement"
+resource "aws_cloudwatch_log_group" "create_engagement_for" {
+    name = "/aws/lambda/create_engagement_for"
     retention_in_days = "${var.cloudwatch_log_retention}"
 }
 
@@ -128,11 +128,11 @@ resource "aws_iam_policy_attachment" "hubsy_attachment" {
 # Lambda
 #
 
-resource "aws_lambda_function" "create_engagement" {
+resource "aws_lambda_function" "create_engagement_for" {
     filename = "./hubsy.zip"
-    function_name = "create_engagement"
+    function_name = "create_engagement_for"
     role = "${aws_iam_role.hubsy.arn}"
-    handler = "create_engagement.handler"
+    handler = "create_engagement_for.handler"
     source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
@@ -209,14 +209,14 @@ resource "aws_lambda_function" "alexa_router" {
 # Permissions
 #
 
-# Create Engagement
+# Create Engagement For
 
-resource "aws_lambda_permission" "create_engagement_lex" {
-    statement_id = "lex-${var.aws_region}-${aws_lambda_function.create_engagement.function_name}"
+resource "aws_lambda_permission" "create_engagement_for_lex" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.create_engagement_for.function_name}"
     action = "lambda:InvokeFunction"
-    function_name = "${aws_lambda_function.create_engagement.function_name}"
+    function_name = "${aws_lambda_function.create_engagement_for.function_name}"
     principal = "lex.amazonaws.com"
-    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.create_engagement.function_name}:*"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.create_engagement_for.function_name}:*"
 }
 
 # Contact Info
