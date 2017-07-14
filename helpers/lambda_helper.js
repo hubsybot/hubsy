@@ -22,8 +22,15 @@ var getContactInfoCards = (title) => {
 // Constant timeframe cards.
 var getTimeframeCards = (title) => {
     var cards = [{ title : title, buttons : [ ] }];
+    var timeframes = [
+        { "name" : "Today" },
+        { "name" : "Yesterday" },
+        { "name" : "This Week" },
+        { "name" : "Last Week" },
+        { "name" : "Last Month" }
+    ];
 
-    config.timeframes.forEach((timeframe) => {
+    timeframes.forEach((timeframe) => {
         cards[0].buttons.push({ text : timeframe.name, value : timeframe.name.toLowerCase() });
     });
 

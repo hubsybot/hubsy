@@ -1,7 +1,6 @@
 {
     "hubspot" : {
-        "api_key" : "",
-        "base_url" : ""
+        "api_key" : ""
     },
     "sales_people" : [
         {
@@ -9,11 +8,6 @@
             "last" : "",
             "email" : "",
             "ownerId" : ""
-        }
-    ],
-    "timeframes" : [
-        {
-            "name" : ""
         }
     ],
     "engagements" : [
