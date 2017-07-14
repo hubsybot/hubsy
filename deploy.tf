@@ -224,7 +224,7 @@ resource "aws_lambda_permission" "create_engagement_for_lex" {
 resource "aws_lambda_permission" "get_contact_info_lex" {
     statement_id = "lex-${var.aws_region}-${aws_lambda_function.get_contact_info.function_name}"
     action = "lambda:InvokeFunction"
-    function_name = "${aws_lambda_function.get_get_contact_info.function_name}"
+    function_name = "${aws_lambda_function.get_contact_info.function_name}"
     principal = "lex.amazonaws.com"
     source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.get_contact_info.function_name}:*"
 }
