@@ -67,8 +67,8 @@ resource "aws_cloudwatch_log_group" "create_engagement_for" {
     retention_in_days = "${var.cloudwatch_log_retention}"
 }
 
-resource "aws_cloudwatch_log_group" "contact_info" {
-    name = "/aws/lambda/contact_info"
+resource "aws_cloudwatch_log_group" "get_contact_info" {
+    name = "/aws/lambda/get_contact_info"
     retention_in_days = "${var.cloudwatch_log_retention}"
 }
 
@@ -139,11 +139,11 @@ resource "aws_lambda_function" "create_engagement_for" {
     timeout = "${var.lambda_timeout["low"]}"
 }
 
-resource "aws_lambda_function" "contact_info" {
+resource "aws_lambda_function" "get_contact_info" {
     filename = "./hubsy.zip"
-    function_name = "contact_info"
+    function_name = "get_contact_info"
     role = "${aws_iam_role.hubsy.arn}"
-    handler = "contact_info.handler"
+    handler = "get_contact_info.handler"
     source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
     runtime = "${var.lambda_runtime}"
     memory_size = "${var.lambda_memory["low"]}"
@@ -221,12 +221,12 @@ resource "aws_lambda_permission" "create_engagement_for_lex" {
 
 # Contact Info
 
-resource "aws_lambda_permission" "contact_info_lex" {
-    statement_id = "lex-${var.aws_region}-${aws_lambda_function.contact_info.function_name}"
+resource "aws_lambda_permission" "get_contact_info_lex" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.get_contact_info.function_name}"
     action = "lambda:InvokeFunction"
-    function_name = "${aws_lambda_function.contact_info.function_name}"
+    function_name = "${aws_lambda_function.get_get_contact_info.function_name}"
     principal = "lex.amazonaws.com"
-    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.contact_info.function_name}:*"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.get_contact_info.function_name}:*"
 }
 
 # Engagements By People

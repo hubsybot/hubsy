@@ -14,7 +14,7 @@ exports.handler = (event, context, callback) => {
             intent = require(__dirname + "/compare_sales_people");
             break;
         case "GetContactInfo":
-            intent = require(__dirname + "/contact_info");
+            intent = require(__dirname + "/get_contact_info");
             break;
         case "DealsInStage":
             intent = require(__dirname + "/deals_in_stage");
@@ -24,6 +24,9 @@ exports.handler = (event, context, callback) => {
             break;
         case "TotalInDeals":
             intent = require(__dirname + "/total_in_deals");
+            break;
+        case "CreateEngagementFor":
+            intent = require(__dirname + "/create_engagement_for");
             break;
     }
 
