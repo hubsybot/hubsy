@@ -22,8 +22,8 @@ init:
 	rm -rf .terraform && \
 	${TERRAFORM} init \
 		-backend=true \
-		-backend-config="bucket=ken-bot-terraform" \
-		-backend-config="key=ken-bot/terraform.tfstate" \
+		-backend-config="bucket=hubsy-terraform" \
+		-backend-config="key=hubsy/terraform.tfstate" \
 		-backend-config="region=${AWS_REGION}" \
 		-backend-config="profile=${AWS_PROFILE}" \
 		-force-copy

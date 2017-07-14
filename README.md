@@ -9,10 +9,9 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 * Log a call
 
 ### Contact Info
-* What is the contact information for `{person}` (Starts conversation.)
+* What is the contact information for `{person}`.
 
 ### Number of Engagements
-* How many engagements
 * How many `{engagements}` did `{sales}` make `{timeframe}`.
 * How many `{engagements}` did `{sales}` make on `{date}`.
 * How many `{engagements}` were made on `{date}`.
@@ -42,7 +41,7 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 * Terraform Using - Terraform and writing our infrastructure as code allowed for faster development with Lambda and clean infrastructure management.
 * ESLint - We used ESLint so ensure our code was always linted before each deploy and we were following proper development standards.
 
-## Make
+## Makefile
 
 * `make eslint` - Run ESLint against our JS files for coding standards.
 * `make build`  - Zips the Lambda functions for terraform to send to Lambda.
@@ -52,6 +51,6 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 
 ## Release History
 
-### 1.0.0 on 07-16-2017
+### 1.0.0 on July 16 2017
 
 * Hubsy 1.0 initial release!
