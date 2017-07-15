@@ -61,6 +61,11 @@ exports.handler = (event, context, callback) => {
 
     // Second check if the user does or does not want to look for a sales person.
     // This will also validate the confirmation word.
+    // If we have provided all the slots we can assume yes.
+    if(slots.stage.value !== null && slots.sales.value !== null) {
+        slots.confirmation.value = "yes";
+    }
+
     if(slots.confirmation.value !== "yes" && slots.confirmation.value !== "no") {
         return lambda_helper.processValidation(callback, event, "confirmation", "I'm sorry I did not understand your confirmation. Please provide yes or no.");
     }

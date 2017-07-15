@@ -21,7 +21,7 @@ const misc_helper    = require(__dirname + "/helpers/misc_helper");
 
 exports.handler = (event, context, callback) => {
     var slots                = lambda_helper.parseSlots(event);
-    var sessionAttributes    = event.sessionAttributes || {};
+    var sessionAttributes    = lambda_helper.parseSession(event);
     var message              = "";
     var selected_contact_id  = null;
     var contact_list         = [];
@@ -100,8 +100,8 @@ exports.handler = (event, context, callback) => {
 
     } else if(contact_confirmation === "yes") {
         // The user selected the last result
-        confirmation_counter = parseInt(event.sessionAttributes.confirmation_count) - 1;
-        contact_list         = JSON.parse(event.sessionAttributes.contact);
+        confirmation_counter = parseInt(sessionAttributes.confirmation_count) - 1;
+        contact_list         = JSON.parse(sessionAttributes.contact);
         var selected_contact     = contact_list[confirmation_counter];
         selected_contact_id  = selected_contact.contact_id;
 
@@ -109,14 +109,15 @@ exports.handler = (event, context, callback) => {
             console.log(sessionAttributes.engagement_step, "greater than 0");
         } else {
             sessionAttributes.engagement_step = 0;
-            event.sessionAttributes = sessionAttributes;
+
+            event = lambda_helper.setSession(event, sessionAttributes);
         }
 
         console.log(`${selected_contact_id} Contact has been confirmed!`);
     // User denied the last contact we showed them.
     } else if(contact_confirmation === "no") {
-        contact_list         = JSON.parse(event.sessionAttributes.contact);
-        confirmation_counter = parseInt(event.sessionAttributes.confirmation_count);
+        contact_list         = JSON.parse(sessionAttributes.contact);
+        confirmation_counter = parseInt(sessionAttributes.confirmation_count);
 
         // Make sure there is still more contacts to cycle through.
         if(contact_list.length - 1 < confirmation_counter) {
@@ -132,9 +133,10 @@ exports.handler = (event, context, callback) => {
         // Reset sessionAttributes to send to lex.
         sessionAttributes.confirmation_count = confirmation_counter;
         sessionAttributes.contact = JSON.stringify(contact_list);
-        event.sessionAttributes = sessionAttributes;
 
-        return lambda_helper.processValidation(callback, event, "contact_confirmation", `Is ${full_name}, ${job_title}, who you are looking for? (yes, no)`);
+        event = lambda_helper.setSession(event, sessionAttributes);
+
+        return lambda_helper.processValidation(callback, event, "contact_confirmation", `Is ${full_name}, ${job_title}, who you are looking for?`);
     // We haven't supplied the user with a contact to confirm yet.
     } else if(contact_confirmation === null) {
         // Define the properties we want back from hubspot
@@ -176,9 +178,10 @@ exports.handler = (event, context, callback) => {
             // Set session attributes for lex.
             sessionAttributes.confirmation_count = confirmation_counter;
             sessionAttributes.contact = JSON.stringify(contact_list);
-            event.sessionAttributes = sessionAttributes;
 
-            return lambda_helper.processValidation(callback, event, "contact_confirmation", `Is ${full_name}, ${job_title}... who you are looking for? (yes, no)`);
+            event = lambda_helper.setSession(event, sessionAttributes);
+
+            return lambda_helper.processValidation(callback, event, "contact_confirmation", `Is ${full_name}, ${job_title}... who you are looking for?`);
 
         }).catch((err) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
@@ -201,10 +204,9 @@ exports.handler = (event, context, callback) => {
             // Call step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 sessionAttributes.engagement_step = 1;
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
                 message = "Was your call answered or did they just ghost you? (answer, no answer)";
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
-
             // Call step 2
             } else if (parseInt(sessionAttributes.engagement_step) === 1) {
                 var call_status = event.inputTranscript;
@@ -220,18 +222,17 @@ exports.handler = (event, context, callback) => {
                 engagement_data.metadata.status = call_status;
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data);
                 sessionAttributes.engagement_step = 2;
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 message = "Ok great, give me a brief summary of the call to log.";
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
-
             // Call step 3
             } else if (parseInt(sessionAttributes.engagement_step) === 2) {
                 //Add meta data to engagement object.
                 engagement_data = JSON.parse(sessionAttributes.engagement_data);
                 engagement_data.metadata.body = event.inputTranscript;
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data);
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 //Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then(() => {
@@ -242,20 +243,18 @@ exports.handler = (event, context, callback) => {
                 });
             };
         } else if(slots.engagements.value === "EMAIL") {
-
             // Email step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 sessionAttributes.engagement_step = 1;
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 message = `Give me the body of the email or in the interest of robot time just give me the gist!`;
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
-
             // Email step 2
             } else if (parseInt(sessionAttributes.engagement_step) === 1) {
                 engagement_data.metadata.text = event.inputTranscript;
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data);
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 //Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then(() => {
@@ -270,7 +269,7 @@ exports.handler = (event, context, callback) => {
             // Meeting step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 sessionAttributes.engagement_step = 1;
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 message = `Awesome, tell me how the meeting went!`;
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
@@ -278,7 +277,7 @@ exports.handler = (event, context, callback) => {
             } else if (parseInt(sessionAttributes.engagement_step) === 1) {
                 engagement_data.metadata.body = event.inputTranscript;
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data);
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 //Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then(() => {
@@ -288,12 +287,11 @@ exports.handler = (event, context, callback) => {
                     return lambda_helper.processCallback(callback, event, "Failed", err.message);
                 });
             };
-
         } else if(slots.engagements.value === "TASK") {
             // Task step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 sessionAttributes.engagement_step = 1;
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 message = `What would you like ${slots.sales.value} to do?`;
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
@@ -303,7 +301,7 @@ exports.handler = (event, context, callback) => {
                 engagement_data.metadata.status = "NOT_STARTED";
                 engagement_data.metadata.forObjectType = "CONTACT";
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data);
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 //Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then(() => {
@@ -313,12 +311,11 @@ exports.handler = (event, context, callback) => {
                     return lambda_helper.processCallback(callback, event, "Failed", err.message);
                 });
             };
-
         } else if(slots.engagements.value === "NOTE") {
             // Note step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
                 sessionAttributes.engagement_step = 1;
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 message = `Thats an easy one! What should the note say?`;
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
@@ -326,7 +323,7 @@ exports.handler = (event, context, callback) => {
             } else if (parseInt(sessionAttributes.engagement_step) === 1) {
                 engagement_data.metadata.body = event.inputTranscript;
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data);
-                event.sessionAttributes = sessionAttributes;
+                event = lambda_helper.setSession(event, sessionAttributes);
 
                 //Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then(() => {

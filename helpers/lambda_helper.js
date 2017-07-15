@@ -188,6 +188,36 @@ exports.processCallback = (callback, event, fulfillmentState, message) => {
     }
 };
 
+// Wrapper for processing the session attributes wether its Lex or Alexa.
+exports.parseSession = (event) => {
+    console.log(`Parsing Session: ${JSON.stringify(event)}`);
+
+    if(event.sessionAttributes !== undefined && event.sessionAttributes !== null) {
+        return event.sessionAttributes;
+    } else if(event.session !== undefined && event.session.attributes !== undefined) {
+        return event.session.attributes;
+    } else {
+        return {};
+    }
+};
+
+// Wrapper for setting the session attributes wether its Lex or Alexa.
+exports.setSession = (event, sessionAttributes) => {
+    console.log(`Session Attributes Are: ${JSON.stringify(sessionAttributes)}`);
+
+    if(event.messageVersion !== undefined) {
+        console.log("Setting Session For Lex");
+
+        event.sessionAttributes = sessionAttributes;
+    } else {
+        console.log("Setting Session For Alexa");
+
+        event.session.attributes = sessionAttributes;
+    }
+
+    return event;
+};
+
 // Wrapper for making a validation callback to Lambda.
 exports.processValidation = (callback, event, slot_to_elicit, message) => {
     var response = {};
@@ -251,7 +281,7 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
 
         response = {
             version : "1.0",
-            sessionAttributes : event.sessionAttributes,
+            sessionAttributes : event.session.attributes,
             response : {
                 outputSpeech : {
                     type : "PlainText",

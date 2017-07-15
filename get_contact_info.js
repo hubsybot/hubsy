@@ -19,7 +19,7 @@ const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 
 exports.handler = (event, context, callback) => {
     var slots             = lambda_helper.parseSlots(event);
-    var sessionAttributes = event.sessionAttributes || {};
+    var sessionAttributes = lambda_helper.parseSession(event);
 
     // Get contact information.
     var contact_info = slots.contact_info.value;
@@ -46,11 +46,11 @@ exports.handler = (event, context, callback) => {
         }
 
         // The user selected the last result
-        confirmation_counter     = parseInt(event.sessionAttributes.confirmation_count) - 1;
-        contact_list             = JSON.parse(event.sessionAttributes.contact);
+        confirmation_counter    = parseInt(sessionAttributes.confirmation_count) - 1;
+        contact_list            = JSON.parse(sessionAttributes.contact);
 
-        var selected_contact     = contact_list[confirmation_counter];
-        var selected_contact_id  = selected_contact.contact_id;
+        var selected_contact    = contact_list[confirmation_counter];
+        var selected_contact_id = selected_contact.contact_id;
 
         // The user has confirmed the contact and the contact_id has been established
         hubspot_helper.createRequest(`/contacts/v1/contact/vid/${selected_contact_id}/profile?`, "GET", null).then((body) => {
@@ -134,8 +134,8 @@ exports.handler = (event, context, callback) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });
     } else if(confirmation === "no") {
-        contact_list         = JSON.parse(event.sessionAttributes.contact);
-        confirmation_counter = parseInt(event.sessionAttributes.confirmation_count);
+        contact_list         = JSON.parse(sessionAttributes.contact);
+        confirmation_counter = parseInt(sessionAttributes.confirmation_count);
 
         // Make sure there is still more contacts to cycle through.
         if(contact_list.length - 1 < confirmation_counter) {
@@ -151,10 +151,10 @@ exports.handler = (event, context, callback) => {
         // Reset sessionAttributes to return to lex.
         sessionAttributes.confirmation_count = confirmation_counter;
         sessionAttributes.contact = JSON.stringify(contact_list);
-        
-        event.sessionAttributes = sessionAttributes;
 
-        return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}, who you are looking for? (yes, no)`);
+        event = lambda_helper.setSession(event, sessionAttributes);
+
+        return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}, who you are looking for?`);
     // We haven't supplied the user with a contact to confirm yet.
     } else if(confirmation === null) {
         // Search for the contacts in HubSpot
@@ -193,9 +193,9 @@ exports.handler = (event, context, callback) => {
             sessionAttributes.confirmation_count = confirmation_counter;
             sessionAttributes.contact = JSON.stringify(contact_list);
 
-            event.sessionAttributes = sessionAttributes;
+            event = lambda_helper.setSession(event, sessionAttributes);
 
-            return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}... who you are looking for? (yes, no)`);
+            return lambda_helper.processValidation(callback, event, "confirmation", `Is ${full_name}, ${job_title}... who you are looking for?`);
         }).catch((err) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });

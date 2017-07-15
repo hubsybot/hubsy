@@ -25,9 +25,6 @@ exports.handler = (event, context, callback) => {
         case "TotalInDeals":
             intent = require(__dirname + "/total_in_deals");
             break;
-        case "CreateEngagementFor":
-            intent = require(__dirname + "/create_engagement_for");
-            break;
     }
 
     // If the intent was not found send back a failure.
