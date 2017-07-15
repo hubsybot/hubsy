@@ -182,7 +182,6 @@ exports.handler = (event, context, callback) => {
             event = lambda_helper.setSession(event, sessionAttributes);
 
             return lambda_helper.processValidation(callback, event, "contact_confirmation", `Is ${full_name}, ${job_title}... who you are looking for?`);
-
         }).catch((err) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
         });
@@ -264,7 +263,6 @@ exports.handler = (event, context, callback) => {
                     return lambda_helper.processCallback(callback, event, "Failed", err.message);
                 });
             };
-
         } else if(slots.engagements.value === "MEETING") {
             // Meeting step 1
             if(parseInt(sessionAttributes.engagement_step) === 0) {
