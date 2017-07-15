@@ -21,9 +21,16 @@ exports.timeframe_check = slot_timeframe => {
             "comparable" : moment(slot_timeframe).startOf("date"),
             "range" : false
         };
-
-        // We arent accounting for exact dates just yet so we will skip for now.
+        console.log("timeframe_obj.comparable", timeframe_obj.comparable)
         return timeframe_obj;
+    } else if(moment(slot_timeframe, "MM-DD-YYYY").isValid() === true) {
+        timeframe_obj = {
+            "operator" : time_equal,
+            "comparable" : moment(slot_timeframe).startOf("date"),
+            "range" : false
+        };
+        console.log("timeframe_obj.comparable", timeframe_obj.comparable)
+        return timeframe_obj;        
     } else {
         timeframes.forEach((timeframe) => {
             if(slot_timeframe.includes(timeframe.name) === true) {
@@ -54,6 +61,14 @@ var timeframes = [
         }
     },
     {
+        "name" : "tomorrow",
+        "properties" : {
+            "operator" : time_equal,
+            "comparable" : moment().startOf("date").add(1, "days"),
+            "range" : false
+        }
+    },    
+    {
         "name" : "this week",
         "properties" : {
             "operator" : time_greater,
@@ -71,6 +86,15 @@ var timeframes = [
         }
     },
     {
+        "name" : "next week",
+        "properties" : {
+            "operator" : time_between,
+            "comparable_low" : moment().startOf("week"),
+            "comparable_high" : moment().startOf("week").add(1, "weeks"),
+            "range" : true
+        }
+    },    
+    {
         "name" : "this month",
         "properties" : {
             "operator" : time_greater,
@@ -87,6 +111,15 @@ var timeframes = [
             "range" : true
         }
     },
+    {
+        "name" : "next month",
+        "properties" : {
+            "operator" : time_between,
+            "comparable_low" : moment().startOf("month"),
+            "comparable_high" : moment().startOf("month").add(1, "months"),
+            "range" : true
+        }
+    },    
     {
         "name" : "this year",
         "properties" : {

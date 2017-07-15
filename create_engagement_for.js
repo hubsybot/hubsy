@@ -18,6 +18,8 @@ const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 const misc_helper    = require(__dirname + "/helpers/misc_helper");
+const time_helper    = require(__dirname + "/helpers/time_helper");
+const moment         = require("moment");
 
 exports.handler = (event, context, callback) => {
     var slots                = lambda_helper.parseSlots(event);
@@ -92,8 +94,8 @@ exports.handler = (event, context, callback) => {
     /*
      * Contact
      */
-    var contact_slot            = slots.contacts.value;
-    var contact_confirmation    = slots.contact_confirmation.value;
+    var contact_slot         = slots.contacts.value;
+    var contact_confirmation = slots.contact_confirmation.value;
     if(contact_slot === null) {
         // Lex didnt recognize the slot name
         return lambda_helper.processValidation(callback, event, "contacts", "What contact does this relate to?");
@@ -102,7 +104,7 @@ exports.handler = (event, context, callback) => {
         // The user selected the last result
         confirmation_counter = parseInt(sessionAttributes.confirmation_count) - 1;
         contact_list         = JSON.parse(sessionAttributes.contact);
-        var selected_contact     = contact_list[confirmation_counter];
+        var selected_contact = contact_list[confirmation_counter];
         selected_contact_id  = selected_contact.contact_id;
 
         if (sessionAttributes.engagement_step > 0) {
@@ -295,15 +297,33 @@ exports.handler = (event, context, callback) => {
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
             // Task step 2
             } else if (parseInt(sessionAttributes.engagement_step) === 1) {
+                // Store the body of the task.
                 engagement_data.metadata.body = event.inputTranscript;
-                engagement_data.metadata.status = "NOT_STARTED";
-                engagement_data.metadata.forObjectType = "CONTACT";
+                sessionAttributes.engagement_step = 2;
                 sessionAttributes.engagement_data = JSON.stringify(engagement_data);
                 event = lambda_helper.setSession(event, sessionAttributes);
 
-                //Make Hubspot Post
+                message = `When is this task due?`;
+                return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
+            // Task step 3    
+            } else if (parseInt(sessionAttributes.engagement_step) === 2) {
+                // Parse and validate user's due date into epoch.
+                var due_date = time_helper.timeframe_check(event.inputTranscript);                
+                if(due_date.range === true) {
+                    due_date = due_date.comparable_high.unix() * 1000;
+                } else {
+                    due_date = due_date.comparable.unix() * 1000;
+                };
+
+                engagement_data = JSON.parse(sessionAttributes.engagement_data);
+                // Finalize task object.
+                engagement_data.engagement.timestamp   = due_date;
+                engagement_data.metadata.status        = "NOT_STARTED";
+                engagement_data.metadata.forObjectType = "CONTACT";
+
+                // Make Hubspot Post
                 hubspot_helper.createRequest(`/engagements/v1/engagements/`, "POST", engagement_data).then(() => {
-                    message = "Sounds good, I relayed the message. Do you think I could send some robot work in their direction while we are at it?";
+                    message = "Sounds good, I relayed the message. Do you think I could also send some robot work in their direction while we are at it?";
                     return lambda_helper.processCallback(callback, event, "Fulfilled", message);
                 }).catch((err) => {
                     return lambda_helper.processCallback(callback, event, "Failed", err.message);

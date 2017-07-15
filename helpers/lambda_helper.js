@@ -201,7 +201,7 @@ exports.parseSession = (event) => {
     }
 };
 
-// Wrapper for setting the session attributes wether its Lex or Alexa.
+// Wrapper for setting the session attributes whether its Lex or Alexa.
 exports.setSession = (event, sessionAttributes) => {
     console.log(`Session Attributes Are: ${JSON.stringify(sessionAttributes)}`);
 
@@ -209,6 +209,24 @@ exports.setSession = (event, sessionAttributes) => {
         console.log("Setting Session For Lex");
 
         event.sessionAttributes = sessionAttributes;
+    } else {
+        console.log("Setting Session For Alexa");
+
+        event.session.attributes = sessionAttributes;
+    }
+
+    return event;
+};
+
+// Wrapper for setting the slots whether its Lex or Alexa.
+exports.setSlot = (event, slot, value) => {
+    console.log(`Slots Are: ${JSON.stringify(event.currentIntent.slots)}`);
+
+    if(event.messageVersion !== undefined) {
+        console.log("Setting Session For Lex");
+
+        event.currentIntent.slots[slot] = value
+        console.log(`${slot} has been set to ${value}`)
     } else {
         console.log("Setting Session For Alexa");
 

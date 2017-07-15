@@ -8,3 +8,9 @@ exports.format_engagement = (engagement_raw) => {
     // Capitalize to match output from Hubspot API.
     return engagement_raw.toUpperCase();
 };
+
+// Returns true or false for email validation.
+exports.validateEmail = (email) => {
+    var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    return re.test(email);
+}
