@@ -51,7 +51,7 @@ exports.handler = (event, context, callback) => {
         body.forEach((data) => {
             data.deals.forEach((deal) => {
                 if(deal.properties.dealstage.value === stage_guid) {
-                    total_amount += parseFloat(deal.properties.amount.value);
+                    total_amount += parseFloat(deal.properties.amount.value).toFixed(2);
                 }
             });
         });
