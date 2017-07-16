@@ -225,12 +225,14 @@ exports.setSlot = (event, slot, value) => {
     if(event.messageVersion !== undefined) {
         console.log("Setting Session For Lex");
 
-        event.currentIntent.slots[slot] = value
-        console.log(`${slot} has been set to ${value}`)
+        event.currentIntent.slots[slot] = value;
+        
+        console.log(`${slot} has been set to ${value}`);
     } else {
-        console.log("Setting Session For Alexa");
-
-        event.session.attributes = sessionAttributes;
+        // @TODO Alexa
+        // console.log("Setting Session For Alexa");
+        //
+        // event.session.attributes = sessionAttributes;
     }
 
     return event;

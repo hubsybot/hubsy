@@ -44,25 +44,25 @@ exports.handler = (event, context, callback) => {
         if (contact_prompt === true) {
             // Grab email from transcript.
             contact_email = event.inputTranscript;
-            
+
             // Validate email.
             email_valid = misc_helper.validateEmail(contact_email);
             if (email_valid === false) {
                 message = "Please provide me with a valid email address.";
-                return lambda_helper.processValidation(callback, event, "contact_email", message);            
+                return lambda_helper.processValidation(callback, event, "contact_email", message);
             } else {
                 // Manually set the slot.
-                lambda_helper.setSlot(event, "contact_email", contact_email);         
+                lambda_helper.setSlot(event, "contact_email", contact_email);
             };
         } else {
             // Initially prompt th user for the email address of the contact.
             sessionAttributes.contact_email_prompt = true;
             event = lambda_helper.setSession(event, sessionAttributes);
-                        
+
             message = "Hit me with the email address of the contact you want to create or update.";
             return lambda_helper.processValidation(callback, event, "contact_email", message);
         }
-    // If lex recognizes the email off the bat, just validate it to make sure.        
+    // If lex recognizes the email off the bat, just validate it to make sure.
     } else {
         // Lex sends emails back like mailto: {email} | {email}.
         contact_email = contact_email.includes("|") ? contact_email.split("|")[1] : contact_email;
@@ -70,11 +70,11 @@ exports.handler = (event, context, callback) => {
         email_valid = misc_helper.validateEmail(contact_email);
         if (email_valid === false) {
             message = "Please provide me with a valid email address.";
-            return lambda_helper.processValidation(callback, event, "contact_email", message);            
+            return lambda_helper.processValidation(callback, event, "contact_email", message);
         } else {
             // Update slot with split value.
             console.log('setting email bruh');
-            lambda_helper.setSlot(event, "contact_email", contact_email);              
+            lambda_helper.setSlot(event, "contact_email", contact_email);
         }
     }
 
@@ -122,7 +122,7 @@ exports.handler = (event, context, callback) => {
     if(city === null) {
         message = "What city does the contact live/work in?";
         return lambda_helper.processValidation(callback, event, "city", message);
-    }     
+    }
 
     /*
      * Confirmation and Post
@@ -157,16 +157,15 @@ exports.handler = (event, context, callback) => {
             {
                 "property": "state",
                 "value": state,
-            },                                                                                                       
+            },
         ]
     };
 
     if(contact_confirmation === null) {
-        // @TODO This isnt working with cards...
-        // message = `Does this look good to you? ${first_name} ${last_name} ${company} ${contact_email} ${phone} ${city}, ${state}`;
-        message = 'Does this look good to you?';
+        message = `Does this look good to you? ${first_name} ${last_name} ${company} ${contact_email} ${phone} ${city}, ${state}`;
+
         return lambda_helper.processValidation(callback, event, "contact_confirmation", message);
-       
+
     } else if(contact_confirmation === "no") {
         message = "Hubsy understands he has failed you. Hubsy leave now.";
         return lambda_helper.processCallback(callback, event, "Failed", err.message);
@@ -179,6 +178,6 @@ exports.handler = (event, context, callback) => {
             return lambda_helper.processCallback(callback, event, "Fulfilled", message);
         }).catch((err) => {
             return lambda_helper.processCallback(callback, event, "Failed", err.message);
-        });        
+        });
     };
 };

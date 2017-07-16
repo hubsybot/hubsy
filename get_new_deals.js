@@ -42,11 +42,11 @@ exports.handler = (event, context, callback) => {
         // Loop through each of the deals and if one matches the id of the stage
         // then increase the counter.
         if(body.results == null) {
-            message = 'You have' +
-                'Zero' +
-                'new' +
-                'deals... ' +
-                'Hubsy leave now.';
+            message = "You have <br />" +
+                'Zero <br />' +
+                "new <br />" +
+                'deals...<br />' +
+                'Hubsy leave now./';
 
         } else {
             body.forEach((data) => {
@@ -54,8 +54,9 @@ exports.handler = (event, context, callback) => {
                     console.log(deal)
                 });
             });
-            message = "'/n' I need to successfully break a line '/n'" +
-                "Continued Message '/n'" + 
+
+            message = "I need to successfully break a line <br />" +
+                "Continued Message '/n'" +
                 "Still going /n" +
                 "Hubsy leave now. '/n'"
         };

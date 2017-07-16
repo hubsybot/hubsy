@@ -21,7 +21,7 @@ exports.timeframe_check = slot_timeframe => {
             "comparable" : moment(slot_timeframe).startOf("date"),
             "range" : false
         };
-        console.log("timeframe_obj.comparable", timeframe_obj.comparable)
+        console.log("timeframe_obj.comparable", timeframe_obj.comparable);
         return timeframe_obj;
     } else if(moment(slot_timeframe, "MM-DD-YYYY").isValid() === true) {
         timeframe_obj = {
@@ -29,8 +29,8 @@ exports.timeframe_check = slot_timeframe => {
             "comparable" : moment(slot_timeframe).startOf("date"),
             "range" : false
         };
-        console.log("timeframe_obj.comparable", timeframe_obj.comparable)
-        return timeframe_obj;        
+        console.log("timeframe_obj.comparable", timeframe_obj.comparable);
+        return timeframe_obj;
     } else {
         timeframes.forEach((timeframe) => {
             if(slot_timeframe.includes(timeframe.name) === true) {
@@ -67,7 +67,7 @@ var timeframes = [
             "comparable" : moment().startOf("date").add(1, "days"),
             "range" : false
         }
-    },    
+    },
     {
         "name" : "this week",
         "properties" : {
@@ -93,7 +93,7 @@ var timeframes = [
             "comparable_high" : moment().startOf("week").add(1, "weeks"),
             "range" : true
         }
-    },    
+    },
     {
         "name" : "this month",
         "properties" : {
@@ -119,7 +119,7 @@ var timeframes = [
             "comparable_high" : moment().startOf("month").add(1, "months"),
             "range" : true
         }
-    },    
+    },
     {
         "name" : "this year",
         "properties" : {

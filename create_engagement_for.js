@@ -19,7 +19,6 @@ const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
 const misc_helper    = require(__dirname + "/helpers/misc_helper");
 const time_helper    = require(__dirname + "/helpers/time_helper");
-const moment         = require("moment");
 
 exports.handler = (event, context, callback) => {
     var slots                = lambda_helper.parseSlots(event);
@@ -305,10 +304,10 @@ exports.handler = (event, context, callback) => {
 
                 message = `When is this task due?`;
                 return lambda_helper.processValidation(callback, event, "meta_confirmation", message);
-            // Task step 3    
+            // Task step 3
             } else if (parseInt(sessionAttributes.engagement_step) === 2) {
                 // Parse and validate user's due date into epoch.
-                var due_date = time_helper.timeframe_check(event.inputTranscript);                
+                var due_date = time_helper.timeframe_check(event.inputTranscript);
                 if(due_date.range === true) {
                     due_date = due_date.comparable_high.unix() * 1000;
                 } else {
