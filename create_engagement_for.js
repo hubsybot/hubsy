@@ -307,7 +307,7 @@ exports.handler = (event, context, callback) => {
             // Task step 3
             } else if (parseInt(sessionAttributes.engagement_step) === 2) {
                 // Parse and validate user's due date into epoch.
-                var due_date = time_helper.timeframe_check(event.inputTranscript);
+                var due_date = time_helper.timeframe_check(event.inputTranscript.toLowerCase());
                 if(due_date.range === true) {
                     due_date = due_date.comparable_high.unix() * 1000;
                 } else {
