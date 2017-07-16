@@ -100,7 +100,7 @@ exports.handler = (event, context, callback) => {
     };
 
     if(phone === null) {
-        message = "What is this contacts phone number?";
+        message = "What is this contacts phone number (only numbers)?";
         return lambda_helper.processValidation(callback, event, "phone", message);
     };
 
@@ -168,7 +168,7 @@ exports.handler = (event, context, callback) => {
 
     } else if(contact_confirmation === "no") {
         message = "Hubsy understands he has failed you. Hubsy leave now.";
-        return lambda_helper.processCallback(callback, event, "Failed", err.message);
+        return lambda_helper.processCallback(callback, event, "Failed", message);
 
     } else if(contact_confirmation === "yes") {
         console.log("contact_data", contact_data);

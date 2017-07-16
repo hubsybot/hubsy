@@ -226,13 +226,8 @@ exports.setSlot = (event, slot, value) => {
         console.log("Setting Session For Lex");
 
         event.currentIntent.slots[slot] = value;
-        
+
         console.log(`${slot} has been set to ${value}`);
-    } else {
-        // @TODO Alexa
-        // console.log("Setting Session For Alexa");
-        //
-        // event.session.attributes = sessionAttributes;
     }
 
     return event;
@@ -278,8 +273,7 @@ exports.processValidation = (callback, event, slot_to_elicit, message) => {
 
             response.dialogAction.message = null;
         } else if(slot_to_elicit === "confirmation" || slot_to_elicit === "contact_confirmation") {
-            response.dialogAction.responseCard = createCard(getConfirmationCards(message));
-            response.dialogAction.message = null;
+            response.dialogAction.responseCard = createCard(getConfirmationCards("Does the data look good?"));
         } else if(slot_to_elicit === "engagements") {
             response.dialogAction.responseCard = createCard(getEngagmentCards("What engagement would you like?"));
             response.dialogAction.message = null;
