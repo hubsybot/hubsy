@@ -42,8 +42,8 @@ exports.handler = (event, context, callback) => {
         // Loop through each of the deals and if one matches the id of the stage
         // then increase the counter.
         if(body.results == null) {
-            message = "You have <br />" +
-                'Zero <br />' +
+            message = "You have \n" +
+                "Zero \n" +
                 "new <br />" +
                 'deals...<br />' +
                 'Hubsy leave now./';
