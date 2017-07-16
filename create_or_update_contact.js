@@ -165,11 +165,9 @@ exports.handler = (event, context, callback) => {
         message = `Does this look good to you? ${first_name} ${last_name} ${company} ${contact_email} ${phone} ${city}, ${state}`;
 
         return lambda_helper.processValidation(callback, event, "contact_confirmation", message);
-
     } else if(contact_confirmation === "no") {
         message = "Hubsy understands he has failed you. Hubsy leave now.";
         return lambda_helper.processCallback(callback, event, "Failed", message);
-
     } else if(contact_confirmation === "yes") {
         console.log("contact_data", contact_data);
         // Make Hubspot Post
