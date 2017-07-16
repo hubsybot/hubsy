@@ -122,7 +122,7 @@ exports.handler = (event, context, callback) => {
                     content = `Name is ${full_name}`;
                 }
             } else if(contact_info.includes("phone")) {
-                if(data.phone.value === null) {
+                if(person_data.phone.value === null) {
                     return lambda_helper.processValidation(callback, event, "contact_info", `Oops, phone is unavailable for ${full_name}, want something else? (email, title)`);
                 } else {
                     content = `Phone is ${phone}`;
