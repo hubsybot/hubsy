@@ -51,13 +51,13 @@ exports.handler = (event, context, callback) => {
         body.forEach((data) => {
             data.deals.forEach((deal) => {
                 if(deal.properties.dealstage.value === stage_guid) {
-                    total_amount += parseFloat(deal.properties.amount.value).toFixed(2);
+                    total_amount += parseFloat(deal.properties.amount.value);
                 }
             });
         });
 
         // Build the content to send back to Lex.
-        content = `The total amount is ${total_amount} dollars.`;
+        content = `The total amount is ${total_amount.toFixed(2)} dollars.`;
 
         return lambda_helper.processCallback(callback, event, "Fulfilled", content);
     }).catch((err) => {
