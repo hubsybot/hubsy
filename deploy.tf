@@ -62,6 +62,11 @@ variable "lambda_timeout" { default = {
 # CloudWatch Logs
 #
 
+resource "aws_cloudwatch_log_group" "help" {
+    name = "/aws/lambda/help"
+    retention_in_days = "${var.cloudwatch_log_retention}"
+}
+
 resource "aws_cloudwatch_log_group" "get_new_deals" {
     name = "/aws/lambda/get_new_deals"
     retention_in_days = "${var.cloudwatch_log_retention}"
@@ -137,6 +142,17 @@ resource "aws_iam_policy_attachment" "hubsy_attachment" {
 #
 # Lambda
 #
+
+resource "aws_lambda_function" "help" {
+    filename = "./hubsy.zip"
+    function_name = "help"
+    role = "${aws_iam_role.hubsy.arn}"
+    handler = "help.handler"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
+    runtime = "${var.lambda_runtime}"
+    memory_size = "${var.lambda_memory["low"]}"
+    timeout = "${var.lambda_timeout["low"]}"
+}
 
 resource "aws_lambda_function" "get_new_deals" {
     filename = "./hubsy.zip"
@@ -241,7 +257,17 @@ resource "aws_lambda_function" "alexa_router" {
 # Permissions
 #
 
-# Create or Update Contact
+# Help
+
+resource "aws_lambda_permission" "help" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.help.function_name}"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.help.function_name}"
+    principal = "lex.amazonaws.com"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.help.function_name}:*"
+}
+
+# Getting New Deals
 
 resource "aws_lambda_permission" "get_new_deals" {
     statement_id = "lex-${var.aws_region}-${aws_lambda_function.get_new_deals.function_name}"
