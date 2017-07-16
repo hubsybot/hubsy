@@ -19,23 +19,19 @@
 const config         = require(__dirname + "/config/config.json");
 const hubspot_helper = require(__dirname + "/helpers/hubspot_helper");
 const lambda_helper  = require(__dirname + "/helpers/lambda_helper");
-const time_helper    = require(__dirname + "/helpers/time_helper");
-const moment         = require("moment");
 
 exports.handler = (event, context, callback) => {
-    var slots = lambda_helper.parseSlots(event);
-
     /*
      * Check for new deals
      */
 
     // https://developers.hubspot.com/docs/methods/deals/get_deals_created
     hubspot_helper.createRequest("/deals/v1/deal/recent/created/?", "GET", null).then((body) => {
-        var messages = "";
+        var message = "";
         var header   = "";
 
-        if(body[0].results == null) {
-            message = `There are no new deals. Should I start cracking the robot whip on sales?`
+        if(body[0].results === null) {
+            message = `There are no new deals. Should I start cracking the robot whip on sales?`;
 
         } else {
             var deals_total = 0;
@@ -48,20 +44,20 @@ exports.handler = (event, context, callback) => {
                     var amount     = deal.properties.amount.value;
                     var owner      = deal.properties.hubspot_owner_id.sourceId;
                     var stage_guid = deal.properties.dealstage.value;
-                    var stage      = null;
-                    
+                    var stage_name = null;
+
                     // Map stage guid to stage name.
-                    config.stages.forEach((stage) => {
-                        if(stage_guid == stage.guid) {
-                            stage = stage.name;
-                        };
+                    config.stages.forEach((stage) => {                        
+                        if(stage_guid === stage.guid) {
+                            stage_name = stage.name;
+                        }
                     });
 
-                    deals.push(`Deal titled: ${name} owned by ${owner} worth $${amount} in ${stage} stage.`);
+                    deals.push(`Deal titled: ${name} owned by ${owner} worth $${amount} in ${stage_name} stage. \n`);
                 });
             });
 
-            header = `There are a total of ${deals_total} new deal(s). Here are some of the most recent:\n`;
+            header = `There are a total of ${deals_total} new deal(s). Here are some of the most recent:\n \n`;
             message = header + deals.join("\n");
         };
 
