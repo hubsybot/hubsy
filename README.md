@@ -10,6 +10,7 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 
 ### Contact Info
 * What is the contact information for `{person}`.
+* Create a contact.
 
 ### Number of Engagements
 * How many `{engagements}` did `{sales}` make `{timeframe}`.
@@ -26,6 +27,9 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 * What is the total value of deals in the `{stage}​` stage.
 * How much money is in `{stage}​`.
 * What is the total value of deals.
+
+### Misc
+* Help
 
 ## AWS/Third Party Services Used
 * Lex - This is the service that allowed us to build the conversational piece to our bot. We gave it potential utterances that a person on a sales team would likely say.
