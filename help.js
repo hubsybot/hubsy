@@ -11,8 +11,7 @@
 const lambda_helper = require(__dirname + "/helpers/lambda_helper");
 
 exports.handler = (event, context, callback) => {
-    var message = `Hi I am Hubsy the HubSpot bot!\n\n`;
-    message = message + `For example you could ask me to do things like:\n\n`;
+    var message = `For example you could ask me to do things like:\n\n`;
     message = message + `- Create a task for Andy. \n`;
     message = message + `- Create a new contact. \n`;
     message = message + `- Update the contact batman@example.com. \n`;

@@ -62,6 +62,11 @@ variable "lambda_timeout" { default = {
 # CloudWatch Logs
 #
 
+resource "aws_cloudwatch_log_group" "tell_me_about_self" {
+    name = "/aws/lambda/tell_me_about_self"
+    retention_in_days = "${var.cloudwatch_log_retention}"
+}
+
 resource "aws_cloudwatch_log_group" "help" {
     name = "/aws/lambda/help"
     retention_in_days = "${var.cloudwatch_log_retention}"
@@ -142,6 +147,17 @@ resource "aws_iam_policy_attachment" "hubsy_attachment" {
 #
 # Lambda
 #
+
+resource "aws_lambda_function" "tell_me_about_self" {
+    filename = "./hubsy.zip"
+    function_name = "tell_me_about_self"
+    role = "${aws_iam_role.hubsy.arn}"
+    handler = "help.handler"
+    source_code_hash = "${base64sha256(file("./hubsy.zip"))}"
+    runtime = "${var.lambda_runtime}"
+    memory_size = "${var.lambda_memory["low"]}"
+    timeout = "${var.lambda_timeout["low"]}"
+}
 
 resource "aws_lambda_function" "help" {
     filename = "./hubsy.zip"
@@ -256,6 +272,16 @@ resource "aws_lambda_function" "alexa_router" {
 #
 # Permissions
 #
+
+# Tell Me About Self
+
+resource "aws_lambda_permission" "tell_me_about_self" {
+    statement_id = "lex-${var.aws_region}-${aws_lambda_function.tell_me_about_self.function_name}"
+    action = "lambda:InvokeFunction"
+    function_name = "${aws_lambda_function.tell_me_about_self.function_name}"
+    principal = "lex.amazonaws.com"
+    source_arn = "arn:aws:lex:us-east-1:${var.aws_account_id}:intent:${aws_lambda_function.tell_me_about_self.function_name}:*"
+}
 
 # Help
 
