@@ -27,6 +27,7 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 * What is the total value of deals in the `{stage}​` stage.
 * How much money is in `{stage}​`.
 * What is the total value of deals.
+* Show me recent deals.
 
 ### Misc
 * Help
