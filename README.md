@@ -55,6 +55,6 @@ Hubsy the HubSpot bot is your own personal assistant to help you manage your Hub
 
 ## Release History
 
-### 1.0.0 on July 16 2017
+### 1.0.0 on July 17 2017
 
 * Hubsy 1.0 initial release!
